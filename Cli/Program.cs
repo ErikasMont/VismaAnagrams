@@ -1,4 +1,4 @@
-﻿using BusinessLogic.Repositories;
+﻿using BusinessLogic.DataAccess;
 using BusinessLogic.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +14,7 @@ IConfiguration config = new ConfigurationBuilder()
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
         services.AddSingleton<IAnagramSolver, AnagramSolver>()
-            .AddSingleton<IWordRepository, WordRepository>())
+            .AddSingleton<IWordRepository, WordDataAccess>())
     .Build();
 
 var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();

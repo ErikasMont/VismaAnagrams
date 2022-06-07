@@ -19,4 +19,10 @@ public class Anagram
 
         return this.Word.Equals(anagram.Word);
     }
+    
+    public override int GetHashCode()
+    {
+        int hashWord = Word == null ? 0 : Word.GetHashCode();
+        return hashWord;
+    }
 }
