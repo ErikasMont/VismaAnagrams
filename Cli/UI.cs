@@ -1,4 +1,3 @@
-using BusinessLogic.Services;
 using Contracts.Interfaces;
 using Contracts.Models;
 
@@ -18,7 +17,7 @@ public class UI
 
     public void Run()
     {
-        bool flag = true;
+        var flag = true;
         Console.WriteLine("Hello! Welcome to anagram solver app");
         while (flag)
         {
@@ -30,7 +29,7 @@ public class UI
     private void UserInput()
     {
         Console.WriteLine("Please type in the word that you would like to get an anagram for: ");
-        string word = Console.ReadLine();
+        var word = Console.ReadLine();
         if (string.IsNullOrEmpty(word))
         {
             Console.WriteLine("No word given. Try again.");
@@ -41,7 +40,7 @@ public class UI
         }
         else
         {
-            List<Anagram> anagrams = _anagramSolver.GetAnagrams(word, _anagramsCount);
+            var anagrams = _anagramSolver.GetAnagrams(word, _anagramsCount);
             if (anagrams == null || anagrams.Count == 0)
             {
                 Console.WriteLine("No anagrams were found for the given word.");
@@ -56,7 +55,7 @@ public class UI
     private bool ExitChoice()
     {
         Console.WriteLine("Would you like to exit? (y/n): ");
-        string choice = Console.ReadLine();
+        var choice = Console.ReadLine();
         if (string.IsNullOrEmpty(choice) || (choice != "y" && choice != "n"))
         {
             Console.WriteLine("Wrong input given. Exiting.");
