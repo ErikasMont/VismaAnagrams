@@ -1,13 +1,15 @@
 using Contracts.Models;
+using Contracts.Interfaces;
 
 namespace BusinessLogic.Repositories;
 
-public class WordRepository : Contracts.Interfaces.IWordRepository
+public class WordRepository : IWordRepository
 {
-    public Dictionary<string, List<Anagram>> ReadDictionary(string filePath)
+    private const string _fileName = "zodynas.txt";
+    public Dictionary<string, List<Anagram>> ReadDictionary()
     {
         var anagrams = new Dictionary<string, List<Anagram>>();
-        using (FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Read))
+        using (FileStream fs = File.Open(_fileName, FileMode.Open, FileAccess.Read))
         {
             using (BufferedStream bs = new BufferedStream(fs))
             {

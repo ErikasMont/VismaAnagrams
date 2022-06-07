@@ -20,4 +20,8 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-preview.4.22229.4" />
     </ItemGroup>
 
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command="copy &quot;$(SolutionDir)\Cli\appsettings.json&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(TargetDir)&quot;" />
+    </Target>
+
 </Project>
