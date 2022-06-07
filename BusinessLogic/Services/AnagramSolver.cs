@@ -16,7 +16,7 @@ public class AnagramSolver : Contracts.Interfaces.IAnagramSolver
     {
         List<Anagram> anagrams = new List<Anagram>();
         Anagram anagram = new Anagram(myWords);
-        var dictionary = _wordRepository.ReadDictionary("../../../../zodynas.txt");
+        var dictionary = _wordRepository.ReadDictionary();
         
         char[] letters = myWords.ToCharArray();
         Array.Sort(letters);
