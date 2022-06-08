@@ -18,7 +18,7 @@ public class WordDataAccess : IWordRepository
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        string[] parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+                        var parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
                         var value = parts[0];
                         var word = new Word(value);
                         words.Add(word);
