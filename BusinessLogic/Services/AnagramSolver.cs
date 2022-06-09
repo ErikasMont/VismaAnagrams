@@ -25,6 +25,10 @@ public class AnagramSolver : IAnagramSolver
             return anagrams;
         }
         var parts = anagram.Word.Split(' ');
+        if (parts.Contains(""))
+        {
+            parts = parts.Where(x => x != "").ToArray();
+        }
         if (parts.Length > 1)
         {
             var inputWords = parts.Select(x => new Anagram(x)).ToList();
@@ -34,6 +38,7 @@ public class AnagramSolver : IAnagramSolver
             return anagrams;
         }
 
+        anagram.Word = parts[0];
         var inputKey = Alphabetize(myWords);
 
         if (!sortedWords.TryGetValue(inputKey, out anagrams))
@@ -52,9 +57,9 @@ public class AnagramSolver : IAnagramSolver
         {
             return filteredAnagrams;
         }
-        if (anagrams.Count < numberOfAnagrams)
+        if (filteredAnagrams.Count < numberOfAnagrams)
         {
-            numberOfAnagrams = anagrams.Count;
+            numberOfAnagrams = filteredAnagrams.Count;
         }
                 
         return filteredAnagrams.GetRange(0, numberOfAnagrams);
@@ -224,7 +229,7 @@ public class AnagramSolver : IAnagramSolver
                 var sentence = new Anagram("");
                 foreach (var anagram in utilList)
                 {
-                    sentence.Word = sentence.Word + " " + anagram.Word;
+                    sentence.Word += anagram.Word + " ";
                 }
                 
                 if (!sortedWords.TryGetValue(keySentence[i].Word, out var values))
@@ -240,7 +245,7 @@ public class AnagramSolver : IAnagramSolver
                 
                 foreach (var value in values)
                 {
-                    sentence.Word = sentence.Word + " " + value.Word;
+                    sentence.Word += value.Word;
                     anagrams.Add(sentence);
                 }
             }

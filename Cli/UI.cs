@@ -76,6 +76,11 @@ public class UI
     private void PrintAnagrams(List<Anagram> anagrams)
     {
         Console.Write("Anagrams: ");
+        Anagram test = new Anagram("keras vaga");
+        if (anagrams.Contains(test))
+        {
+            Console.WriteLine("praeina");
+        }
         foreach (var anagram in anagrams)
         {
             Console.Write("{0} ", anagram.Word);

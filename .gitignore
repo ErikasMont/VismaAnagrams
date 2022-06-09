@@ -5,3 +5,5 @@
 /Cli/bin/
 /Contracts/obj/
 /Contracts/bin/
+/Tests/bin/
+/Tests/obj/
