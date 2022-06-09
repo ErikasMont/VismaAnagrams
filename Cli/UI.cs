@@ -29,7 +29,6 @@ public class UI
     private void UserInput()
     {
         Console.WriteLine("To find anagrams for a sentence separate the words using a space e.g (labas rytas)");
-        Console.WriteLine("Currently program works only with two words at most in a sentence.");
         Console.WriteLine("Please type in the words that you would like to get an anagram for: ");
         var word = Console.ReadLine();
         if (string.IsNullOrEmpty(word))

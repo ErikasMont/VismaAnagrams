@@ -27,58 +27,61 @@ public class AnagramSolver : IAnagramSolver
         var parts = anagram.Word.Split(' ');
         if (parts.Length > 1)
         {
-            var inputWords = new List<Anagram>();
-            for (var i = 0; i < parts.Length; i++)
-            { 
-                inputWords.Add(new Anagram(parts[i]));
-            }
+            var inputWords = parts.Select(x => new Anagram(x)).ToList();
+
+            anagrams = GetSentenceAnagrams(sortedWords, inputWords, myWords, numberOfAnagrams);
             
-            var sortedWord = Alphabetize(myWords);
-            var keys = sortedWords.Keys.ToList();
-
-            var sentenceContainingKeys = FindSentenceContainingKeys(keys, sortedWord);
-
-            var sentenceAnagramKeys = FindSentenceAnagramKeys(sentenceContainingKeys, sortedWord, inputWords.Count);
-
-            anagrams = FindAnagramSentences(sentenceAnagramKeys, sortedWords, inputWords);
-
-            anagrams = RemoveDuplicates(anagrams, anagram);
-
-            if (anagrams.Count < numberOfAnagrams)
-            {
-                numberOfAnagrams = anagrams.Count;
-            }
-            
-            return anagrams.GetRange(0, numberOfAnagrams);
+            return anagrams;
         }
 
         var inputKey = Alphabetize(myWords);
 
-        if (sortedWords.TryGetValue(inputKey, out anagrams))
+        if (!sortedWords.TryGetValue(inputKey, out anagrams))
         {
-            if (anagrams.Count == 0)
-            {
-                return anagrams;
-            }
-            
-            var filteredAnagrams = RemoveDuplicates(anagrams, anagram);
-            
-            if (filteredAnagrams.Count == 0)
-            {
-                return filteredAnagrams;
-            }
-            else
-            {
-                if (anagrams.Count < numberOfAnagrams)
-                {
-                    numberOfAnagrams = anagrams.Count;
-                }
-                
-                return filteredAnagrams.GetRange(0, numberOfAnagrams);
-            }
+            return anagrams;
         }
         
-        return anagrams;
+        if (anagrams.Count == 0)
+        {
+            return anagrams;
+        }
+            
+        var filteredAnagrams = RemoveDuplicates(anagrams, anagram);
+            
+        if (filteredAnagrams.Count == 0)
+        {
+            return filteredAnagrams;
+        }
+        if (anagrams.Count < numberOfAnagrams)
+        {
+            numberOfAnagrams = anagrams.Count;
+        }
+                
+        return filteredAnagrams.GetRange(0, numberOfAnagrams);
+    }
+
+    private List<Anagram> GetSentenceAnagrams(Dictionary<string, List<Anagram>> sortedWords, List<Anagram> inputWords, 
+        string myWords, int numberOfAnagrams)
+    {
+        var anagram = new Anagram(myWords);
+
+        var sortedWord = Alphabetize(myWords);
+        var keys = sortedWords.Keys.ToList();
+
+        var sentenceContainingKeys = FindSentenceContainingKeys(keys, sortedWord);
+
+        var sentenceAnagramKeys = FindSentenceAnagramKeys(sentenceContainingKeys, sortedWord, inputWords.Count);
+
+        var anagrams = FindAnagramSentences(sentenceAnagramKeys, sortedWords, inputWords);
+
+        anagrams = RemoveDuplicates(anagrams, anagram);
+
+        if (anagrams.Count < numberOfAnagrams)
+        {
+            numberOfAnagrams = anagrams.Count;
+        }
+            
+        return anagrams.GetRange(0, numberOfAnagrams);
     }
 
     private Dictionary<string, List<Anagram>> SortWords(List<Word> words)
@@ -87,9 +90,7 @@ public class AnagramSolver : IAnagramSolver
         foreach (var word in words)
         {
             var anagram = new Anagram(word.Value);
-            var letters = word.Value.ToCharArray();
-            Array.Sort(letters);
-            var sortedKey = new string(letters);
+            var sortedKey = Alphabetize(word.Value);
 
             if (sortedDictionary.ContainsKey(sortedKey))
             {
@@ -97,8 +98,7 @@ public class AnagramSolver : IAnagramSolver
             }
             else
             {
-                var anagrams = new List<Anagram>();
-                anagrams.Add(anagram);
+                var anagrams = new List<Anagram> { anagram };
                 sortedDictionary.Add(sortedKey, anagrams);
             }
         }
@@ -137,12 +137,14 @@ public class AnagramSolver : IAnagramSolver
             var containedLetters = 0;
             for (var i = 0; i < keyLetters.Length; i++)
             {
-                if (temp.Contains(key[i]))
+                if (!temp.Contains(key[i]))
                 {
-                    containedLetters++;
-                    var regex = new Regex(Regex.Escape(key[i].ToString()));
-                    temp = regex.Replace(temp, "", 1);
+                    continue;
                 }
+                
+                containedLetters++;
+                var regex = new Regex(Regex.Escape(key[i].ToString()));
+                temp = regex.Replace(temp, "", 1);
             }
 
             if (containedLetters == key.Length)
@@ -171,23 +173,16 @@ public class AnagramSolver : IAnagramSolver
         {
             for (var i = currentIndex; i < sentenceContainingKeys.Count; i++)
             {
-                string combination = "";
-                foreach (var key in utilList)
-                {
-                    combination += key.Word;
-                }
+                var combination = utilList.Aggregate("", (current, key) => current + key.Word);
                 combination += sentenceContainingKeys[i].Word;
                 combination = Alphabetize(combination);
-                if (combination.Length == sortedWord.Length && sortedWord.Equals(combination))
+                if (combination.Length != sortedWord.Length || !sortedWord.Equals(combination))
                 {
-                    var sentence = new List<Anagram>();
-                    foreach (var key in utilList)
-                    {
-                        sentence.Add(key);
-                    }
-                    sentence.Add(sentenceContainingKeys[i]);
-                    sentenceAnagramKeys.Add(sentence);
+                    continue;
                 }
+                var sentence = utilList.ToList();
+                sentence.Add(sentenceContainingKeys[i]);
+                sentenceAnagramKeys.Add(sentence);
             }
         }
         else
@@ -211,8 +206,7 @@ public class AnagramSolver : IAnagramSolver
         foreach (var pair in correctAnagrams)
         {
             var utilList = new List<Anagram>();
-            var keySentence = pair;
-            AnagramSentencesSearch(anagrams, keySentence, sortedWords,
+            AnagramSentencesSearch(anagrams, pair, sortedWords,
                 inputWords, utilList, 0, 0, pair.Count);
         }
 
@@ -232,19 +226,22 @@ public class AnagramSolver : IAnagramSolver
                 {
                     sentence.Word = sentence.Word + " " + anagram.Word;
                 }
-                var values = new List<Anagram>();
-                if (sortedWords.TryGetValue(keySentence[i].Word, out values))
+                
+                if (!sortedWords.TryGetValue(keySentence[i].Word, out var values))
                 {
-                    values = values.Where(x => inputWords.Contains(x) == false).Distinct().ToList();
-                    if (values.Count == 0)
-                    {
-                        continue;
-                    }
-                    foreach (var value in values)
-                    {
-                        sentence.Word = sentence.Word + " " + value.Word;
-                        anagrams.Add(sentence);
-                    }
+                    continue;
+                }
+                
+                values = values.Where(x => inputWords.Contains(x) == false).Distinct().ToList();
+                if (values.Count == 0)
+                {
+                    continue;
+                }
+                
+                foreach (var value in values)
+                {
+                    sentence.Word = sentence.Word + " " + value.Word;
+                    anagrams.Add(sentence);
                 }
             }
         }
@@ -252,23 +249,23 @@ public class AnagramSolver : IAnagramSolver
         {
             for (var i = currentIndex; i < keySentence.Count; i++)
             {
-                var values = new List<Anagram>();
-                if (sortedWords.TryGetValue(keySentence[i].Word, out values))
+                if (!sortedWords.TryGetValue(keySentence[i].Word, out var values))
                 {
-                    values = values.Where(x => inputWords.Contains(x) == false).ToList();
-                    if (values.Count == 0)
-                    {
-                        continue;
-                    }
-                    foreach (var value in values)
-                    {
-                        utilList.Add(value);
-                        AnagramSentencesSearch(anagrams, keySentence, sortedWords, inputWords,
-                            utilList, ++i, ++currentLoop, loops);
-                        i--;
-                        utilList.Remove(value);
-                        currentLoop--;
-                    }
+                    continue;
+                }
+                values = values.Where(x => inputWords.Contains(x) == false).ToList();
+                if (values.Count == 0)
+                {
+                    continue;
+                }
+                foreach (var value in values)
+                {
+                    utilList.Add(value);
+                    AnagramSentencesSearch(anagrams, keySentence, sortedWords, inputWords,
+                        utilList, ++i, ++currentLoop, loops);
+                    i--;
+                    utilList.Remove(value);
+                    currentLoop--;
                 }
             }
         }

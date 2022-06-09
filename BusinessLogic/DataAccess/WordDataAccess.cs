@@ -9,11 +9,11 @@ public class WordDataAccess : IWordRepository
     public List<Word> ReadWords()
     {
         var words = new List<Word>();
-        using (FileStream fs = File.Open(_fileName, FileMode.Open, FileAccess.Read))
+        using (var fs = File.Open(_fileName, FileMode.Open, FileAccess.Read))
         {
-            using (BufferedStream bs = new BufferedStream(fs))
+            using (var bs = new BufferedStream(fs))
             {
-                using (StreamReader sr = new StreamReader(bs))
+                using (var sr = new StreamReader(bs))
                 {
                     string line;
                     while ((line = sr.ReadLine()) != null)

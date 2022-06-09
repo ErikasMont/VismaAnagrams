@@ -20,5 +20,5 @@ using IHost host = Host.CreateDefaultBuilder(args)
 var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
 
-var ui = new UI(host.Services.GetService<IAnagramSolver>(), anagramCount, minInputLength);
+var ui = new UI(host.Services.GetRequiredService<IAnagramSolver>(), anagramCount, minInputLength);
 ui.Run();
