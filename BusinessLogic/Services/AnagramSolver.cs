@@ -6,20 +6,23 @@ namespace BusinessLogic.Services;
 
 public class AnagramSolver : IAnagramSolver
 {
-    private readonly IWordRepository _wordRepository;
+    private readonly IWordService _wordService;
 
-    public AnagramSolver(IWordRepository wordRepository)
+    public AnagramSolver(IWordService wordService)
     {
-        _wordRepository = wordRepository;
+        _wordService = wordService;
     }
     public List<Anagram> GetAnagrams(string myWords, int numberOfAnagrams)
     {
+        var anagrams = new List<Anagram>();
         var anagram = new Anagram(myWords);
         myWords = Regex.Replace(myWords, @"\s+", "");
-        var words = _wordRepository.ReadWords();
-        var sortedWords = SortWords(words);
-        var anagrams = new List<Anagram>();
-        
+        var sortedWords = _wordService.GetSortedWords();
+        if (sortedWords == null)
+        {
+            return anagrams;
+        }
+
         if (myWords.Length == 0)
         {
             return anagrams;
@@ -39,7 +42,7 @@ public class AnagramSolver : IAnagramSolver
         }
 
         anagram.Word = parts[0];
-        var inputKey = Alphabetize(myWords);
+        var inputKey = _wordService.Alphabetize(myWords);
 
         if (!sortedWords.TryGetValue(inputKey, out anagrams))
         {
@@ -51,7 +54,11 @@ public class AnagramSolver : IAnagramSolver
             return anagrams;
         }
             
-        var filteredAnagrams = RemoveDuplicates(anagrams, anagram);
+        var filteredAnagrams = _wordService.RemoveDuplicates(anagrams, anagram);
+        if (filteredAnagrams == null)
+        {
+            return new List<Anagram>();
+        }
             
         if (filteredAnagrams.Count == 0)
         {
@@ -70,7 +77,7 @@ public class AnagramSolver : IAnagramSolver
     {
         var anagram = new Anagram(myWords);
 
-        var sortedWord = Alphabetize(myWords);
+        var sortedWord = _wordService.Alphabetize(myWords);
         var keys = sortedWords.Keys.ToList();
 
         var sentenceContainingKeys = FindSentenceContainingKeys(keys, sortedWord);
@@ -79,57 +86,19 @@ public class AnagramSolver : IAnagramSolver
 
         var anagrams = FindAnagramSentences(sentenceAnagramKeys, sortedWords, inputWords);
 
-        anagrams = RemoveDuplicates(anagrams, anagram);
+        anagrams = _wordService.RemoveDuplicates(anagrams, anagram);
 
+        if (anagrams == null)
+        {
+            return new List<Anagram>();
+        }
+        
         if (anagrams.Count < numberOfAnagrams)
         {
             numberOfAnagrams = anagrams.Count;
         }
             
         return anagrams.GetRange(0, numberOfAnagrams);
-    }
-
-    private Dictionary<string, List<Anagram>> SortWords(List<Word> words)
-    {
-        var sortedDictionary = new Dictionary<string, List<Anagram>>();
-        foreach (var word in words)
-        {
-            var anagram = new Anagram(word.Value);
-            var sortedKey = Alphabetize(word.Value);
-
-            if (sortedDictionary.ContainsKey(sortedKey))
-            {
-                sortedDictionary[sortedKey].Add(anagram);
-            }
-            else
-            {
-                var anagrams = new List<Anagram> { anagram };
-                sortedDictionary.Add(sortedKey, anagrams);
-            }
-        }
-        
-        return sortedDictionary;
-    }
-
-    private List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userAnagram)
-    {
-        var filteredAnagrams = anagrams.Distinct().ToList();
-        
-        if (filteredAnagrams.Contains(userAnagram))
-        {
-            filteredAnagrams.Remove(userAnagram);
-        }
-        
-        return filteredAnagrams;
-    }
-
-    private string Alphabetize(string value)
-    {
-        var letters = value.ToCharArray();
-        Array.Sort(letters);
-        var key = new string(letters);
-
-        return key;
     }
 
     private List<Anagram> FindSentenceContainingKeys(List<string> keys, string sortedWord)
@@ -180,7 +149,7 @@ public class AnagramSolver : IAnagramSolver
             {
                 var combination = utilList.Aggregate("", (current, key) => current + key.Word);
                 combination += sentenceContainingKeys[i].Word;
-                combination = Alphabetize(combination);
+                combination = _wordService.Alphabetize(combination);
                 if (combination.Length != sortedWord.Length || !sortedWord.Equals(combination))
                 {
                     continue;

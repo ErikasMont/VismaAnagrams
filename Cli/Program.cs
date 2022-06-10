@@ -14,6 +14,7 @@ IConfiguration config = new ConfigurationBuilder()
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
         services.AddSingleton<IAnagramSolver, AnagramSolver>()
+            .AddSingleton<IWordService, WordService>()
             .AddSingleton<IWordRepository, WordDataAccess>())
     .Build();
 

@@ -23,6 +23,10 @@ public class UI
         {
             UserInput();
             flag = ExitChoice();
+            if (!flag)
+            {
+                Console.WriteLine("Exiting.");
+            }
         }
     }
 
@@ -42,13 +46,13 @@ public class UI
         else
         {
             var anagrams = _anagramSolver.GetAnagrams(word, _anagramsCount);
-            if (anagrams == null || anagrams.Count == 0)
+            if (anagrams.Any())
             {
-                Console.WriteLine("No anagrams were found for the given words.");
+                PrintAnagrams(anagrams);
             }
             else
             {
-                PrintAnagrams(anagrams);
+                Console.WriteLine("No anagrams were found for the given words.");
             }
         }
     }
@@ -57,30 +61,17 @@ public class UI
     {
         Console.WriteLine("Would you like to exit? (y/n): ");
         var choice = Console.ReadLine();
-        if (string.IsNullOrEmpty(choice) || (choice != "y" && choice != "n"))
+
+        return choice switch
         {
-            Console.WriteLine("Wrong input given. Exiting.");
-            return false;
-        }
-        else if(choice == "y")
-        {
-            Console.WriteLine("Exiting.");
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+            "n" => true,
+            _ => false
+        };
     }
 
     private void PrintAnagrams(List<Anagram> anagrams)
     {
         Console.Write("Anagrams: ");
-        Anagram test = new Anagram("keras vaga");
-        if (anagrams.Contains(test))
-        {
-            Console.WriteLine("praeina");
-        }
         foreach (var anagram in anagrams)
         {
             Console.Write("{0} ", anagram.Word);
