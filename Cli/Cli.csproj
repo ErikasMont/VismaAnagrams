@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-      <Exec Command="copy &quot;$(SolutionDir)\Cli\appsettings.json&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(TargetDir)&quot;" />
+      <Exec Command="copy &quot;$(SolutionDir)\Cli\appsettings.json&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(SolutionDir)\Tests\bin\Debug\net6.0&quot;" />
     </Target>
 
 </Project>
