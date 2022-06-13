@@ -1,0 +1,14 @@
+﻿@model List<Contracts.Models.Anagram>
+@{
+    ViewData["Title"] = "Anagrams";
+}
+
+<div class="text-center">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var anagram in Model)
+        {
+            <p>@anagram.Word</p>
+        }
+    }
+</div>
