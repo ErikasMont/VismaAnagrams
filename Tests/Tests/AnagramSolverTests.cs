@@ -1,68 +1,68 @@
-using BusinessLogic.DataAccess;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
 using Contracts.Models;
+using Tests.Mocks;
 
-namespace Tests;
+namespace Tests.Tests;
 
 [TestFixture]
 public class AnagramSolverTests
 {
     private IAnagramSolver _anagramSolver;
 
-    [OneTimeSetUp]
+    [SetUp]
     public void Setup()
     {
-        _anagramSolver = new AnagramSolver(new WordDataAccess());
+        _anagramSolver = new AnagramSolver( new WordService(new MockWordRepo(1)));
     }
 
     [TestCase("rega")]
     [TestCase("          ")]
     [TestCase("")]
     [TestCase("visma kava")]
-    public void GetAanagrams_IfOneWordWithoutAnagramsGiven_EmptyListOfAnagrams(string input)
+    public void GetAnagrams_IfInputWithoutAnagramsGiven_EmptyListOfAnagrams(string input)
     {
         var expectedCount = 0;
 
         var anagrams = _anagramSolver.GetAnagrams(input, 2);
         
-        Assert.That(anagrams, Is.TypeOf(typeof(List<Anagram>)));
-        Assert.That(anagrams, Has.Count.EqualTo(expectedCount));
+        anagrams.ShouldNotBeNull();
+        anagrams.Count.ShouldBe(expectedCount);
     }
     
     [TestCase("alus", "sula")]
     [TestCase("toli  ", "loti")]
     [TestCase("geras kava", "keras vaga")]
     [TestCase("geras   kava", "keras vaga")]
-    [TestCase("toli rimti kilti", "likti loti mirti")]
-    public void GetAanagrams_IfOneWordWithOneAnagramGiven_ListOfAnagrams(string input, string output)
+    [TestCase("toli rimti kilti", "loti mirti likti")]
+    public void GetAnagrams_IfInputWithOneAnagramGiven_ListOfAnagrams(string input, string output)
     {
         var expectedCount = 1;
         var expectedAnagram = new Anagram(output);
 
         var anagrams = _anagramSolver.GetAnagrams(input, 2);
         
-        Assert.That(anagrams, Is.TypeOf(typeof(List<Anagram>)));
-        Assert.That(anagrams, Has.Count.EqualTo(expectedCount));
-        Assert.That(anagrams, Contains.Item(expectedAnagram));
+        anagrams.ShouldNotBeNull();
+        anagrams.Count.ShouldBe(expectedCount);
+        expectedAnagram.ShouldBeOneOf(anagrams.ToArray());
     }
     
     [TestCase("tiras", new []{"rasit", "rasti"})]
     [TestCase("tiras   ", new []{"rasit", "rasti"})]
     [TestCase("labas rytas", new []{"balas tyras", "baslys tara"})]
     [TestCase("toli ryti kilti", new []{"irti kloti lyti", "kiloti ly tirti"})]
-    public void GetAanagrams_IfOneWordWithMultipleAnagramsGiven_ListOfAnagrams(string input, string[] output)
+    public void GetAnagrams_IfInputWithMultipleAnagramsGiven_ListOfAnagrams(string input, string[] output)
     {
         var expectedCount = 2;
-        var expectedAnagrams = output.Select(x => new Anagram(x)).ToList();
+        var expectedAnagrams = output.Select(x => new Anagram(x)).ToArray();
 
         var anagrams = _anagramSolver.GetAnagrams(input, 2);
         
-        Assert.That(anagrams, Is.TypeOf(typeof(List<Anagram>)));
-        Assert.That(anagrams, Has.Count.EqualTo(expectedCount));
-        foreach (var anagram in expectedAnagrams)
+        anagrams.ShouldNotBeNull();
+        anagrams.Count.ShouldBe(expectedCount);
+        foreach (var expectedAnagram in expectedAnagrams)
         {
-            Assert.That(anagrams, Contains.Item(anagram));
+            expectedAnagram.ShouldBeOneOf(anagrams.ToArray());
         }
     }
 }
