@@ -43,6 +43,17 @@ public class WordService : IWordService
     {
         return string.Concat(value.OrderBy(v => v));
     }
+
+    public string[] ValidateInputWords(string input)
+    {
+        var parts = input.Split(' ');
+        if (parts.Contains(""))
+        {
+            parts = parts.Where(x => x != "").ToArray();
+        }
+
+        return parts;
+    }
     
     public List<Anagram>? RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
     {
@@ -59,5 +70,20 @@ public class WordService : IWordService
         }
         
         return filteredAnagrams;
+    }
+
+    public bool AddWordToFile(string word)
+    {
+        var words = _wordRepository.ReadWords();
+        if (words.Any(x => x.Value.Equals(word)))
+        {
+            return false;
+        }
+        
+        words.Add(new Word(word));
+        words = words.OrderBy(x => x.Value).ToList();
+        _wordRepository.WriteWords(words);
+        
+        return true;
     }
 }

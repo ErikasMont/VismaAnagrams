@@ -27,11 +27,9 @@ public class AnagramSolver : IAnagramSolver
         {
             return anagrams;
         }
-        var parts = anagram.Word.Split(' ');
-        if (parts.Contains(""))
-        {
-            parts = parts.Where(x => x != "").ToArray();
-        }
+
+        var parts = _wordService.ValidateInputWords(anagram.Word);
+        
         if (parts.Length > 1)
         {
             var inputWords = parts.Select(x => new Anagram(x)).ToList();
@@ -46,7 +44,7 @@ public class AnagramSolver : IAnagramSolver
 
         if (!sortedWords.TryGetValue(inputKey, out anagrams))
         {
-            return anagrams;
+            return new List<Anagram>();
         }
         
         if (anagrams.Count == 0)
@@ -55,15 +53,11 @@ public class AnagramSolver : IAnagramSolver
         }
             
         var filteredAnagrams = _wordService.RemoveDuplicates(anagrams, anagram);
-        if (filteredAnagrams == null)
+        if (filteredAnagrams == null || filteredAnagrams.Count == 0)
         {
             return new List<Anagram>();
         }
-            
-        if (filteredAnagrams.Count == 0)
-        {
-            return filteredAnagrams;
-        }
+        
         if (filteredAnagrams.Count < numberOfAnagrams)
         {
             numberOfAnagrams = filteredAnagrams.Count;

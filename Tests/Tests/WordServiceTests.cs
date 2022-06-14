@@ -8,12 +8,14 @@ namespace Tests.Tests;
 [TestFixture]
 public class WordServiceTests
 {
+    private IWordRepository _wordRepository;
     private IWordService _wordService;
     private IWordService _wordServiceEmpty;
     [SetUp]
     public void Setup()
     {
-        _wordService = new WordService(new MockWordRepo(1));
+        _wordRepository = new MockWordRepo(1);
+        _wordService = new WordService(_wordRepository);
         _wordServiceEmpty = new WordService(new MockWordRepo(2));
     }
     
@@ -35,8 +37,6 @@ public class WordServiceTests
         
         sortedWords.ShouldNotBeNull();
         sortedWords.ShouldContainKey(expectedKey);
-        // During debug values key and value exist, assertion returns false even though values are the same
-        //sortedWords.ShouldContainKeyAndValue(expectedKey, expectedValue);
     }
     
     [TestCase("dcba", "abcd")]
@@ -47,6 +47,22 @@ public class WordServiceTests
         
         output.ShouldNotBeNull();
         output.ShouldBe(expectedOutput);
+    }
+
+    [TestCase("poryt eisim", new []{"poryt", "eisim"})]
+    [TestCase("toli   tenais   ", new []{"toli", "tenais"})]
+    public void ValidateInputWords_Always_ReturnsACorrectArrayOfWords(string input, string[] expectedOutput)
+    {
+        var expectedCount = 2;
+        
+        var output = _wordService.ValidateInputWords(input);
+
+        output.ShouldNotBeNull();
+        output.Length.ShouldBe(expectedCount);
+        foreach (var word in output)
+        {
+            word.ShouldBeOneOf(expectedOutput);
+        }
     }
     
     [Test]
@@ -72,5 +88,25 @@ public class WordServiceTests
         
         output.ShouldNotBeNull();
         output.Count.ShouldBe(expectedCount);
+    }
+
+    [Test]
+    public void AddWordToFile_WhenExistingWordGiven_ReturnsFalse()
+    {
+        var word = "alus";
+
+        var result = _wordService.AddWordToFile(word);
+        
+        result.ShouldBeFalse();
+    }
+    
+    [Test]
+    public void AddWordToFile_WhenNotExistingWordGiven_ReturnsTrue()
+    {
+        var word = "testas";
+
+        var result = _wordService.AddWordToFile(word);
+        
+        result.ShouldBeTrue();
     }
 }

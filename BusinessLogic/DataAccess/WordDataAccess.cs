@@ -28,4 +28,21 @@ public class WordDataAccess : IWordRepository
         }
         return words;
     }
+
+    public void WriteWords(List<Word> words)
+    {
+        using (var fs = File.Open(_fileName, FileMode.Create, FileAccess.Write))
+        {
+            using (var bs = new BufferedStream(fs))
+            {
+                using (var sw = new StreamWriter(bs))
+                {
+                    foreach (var word in words)
+                    {
+                        sw.WriteLine("{0}", word.Value);
+                    }
+                }
+            }
+        }
+    }
 }

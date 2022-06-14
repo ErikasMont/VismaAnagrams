@@ -31,4 +31,9 @@ public class MockWordRepo : IWordRepository
         };
 
     }
+
+    public void WriteWords(List<Word> words)
+    {
+       
+    }
 }
