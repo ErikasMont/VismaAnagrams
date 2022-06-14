@@ -41,7 +41,7 @@ public class WordService : IWordService
     
     public string Alphabetize(string value)
     {
-        return String.Concat(value.OrderBy(v => v));
+        return string.Concat(value.OrderBy(v => v));
     }
     
     public List<Anagram>? RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
