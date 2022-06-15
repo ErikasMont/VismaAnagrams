@@ -39,7 +39,7 @@ public class WordDataAccess : IWordRepository
                 {
                     foreach (var word in words)
                     {
-                        sw.WriteLine("{0}", word.Value);
+                        sw.WriteLine(word.Value);
                     }
                 }
             }

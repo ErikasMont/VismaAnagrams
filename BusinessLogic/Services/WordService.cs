@@ -75,7 +75,7 @@ public class WordService : IWordService
     public bool AddWordToFile(string word)
     {
         var words = _wordRepository.ReadWords();
-        if (words.Any(x => x.Value.Equals(word)))
+        if (words.Any(x => x.Value == word))
         {
             return false;
         }
