@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WebApp.Helpers;
 
-namespace WebAPI.Controllers;
+namespace WebApp.Controllers;
 
 [ApiController]
 [Route("[controller]")]
