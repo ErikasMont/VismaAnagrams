@@ -22,4 +22,4 @@ var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
 
 var ui = new UI(host.Services.GetRequiredService<IAnagramSolver>(), anagramCount, minInputLength);
-ui.Run();
+await ui.Run();
