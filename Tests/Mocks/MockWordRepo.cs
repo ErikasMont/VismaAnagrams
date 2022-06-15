@@ -31,4 +31,13 @@ public class MockWordRepo : IWordRepository
         };
 
     }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <param name="words"></param>
+    public void WriteWords(List<Word> words)
+    {
+       
+    }
 }

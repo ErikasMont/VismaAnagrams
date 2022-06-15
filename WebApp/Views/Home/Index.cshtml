@@ -1,14 +1,27 @@
-﻿@model List<Contracts.Models.Anagram>
+﻿@model WebApp.Models.AnagramViewModel
 @{
     ViewData["Title"] = "Anagrams";
 }
 
+<form asp-action="Index">
+    <div class="form-actions no-color">
+        <label asp-for="SearchString" class="control-label">Search word:</label>
+        <input asp-for="SearchString" class="form-control"/>
+        <input type="submit" value="Search" class="btn btn-default" />
+    </div>
+</form>
+
 <div class="text-center">
-    @if (Model != null && Model.Any())
+    @if (Model != null)
     {
-        foreach (var anagram in Model)
+        if (Model.Anagrams != null)
         {
-            <p>@anagram.Word</p>
+            foreach (var anagram in Model.Anagrams)
+            {
+                <p>@anagram.Word</p>
+            }
         }
+        
+        <p>@Model.ErrorMessage</p>
     }
 </div>

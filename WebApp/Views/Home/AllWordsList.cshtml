@@ -9,7 +9,7 @@
         
         foreach (var word in Model)
         {
-            <a asp-controller="Home" asp-action="Index" asp-route-word="@word.Value">@word.Value</a>
+            <a asp-controller="Home" asp-action="AllWordsList" asp-route-searchString="@word.Value">@word.Value</a>
             <br/>
         }
             

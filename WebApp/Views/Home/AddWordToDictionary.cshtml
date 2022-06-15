@@ -1,0 +1,16 @@
+@model WebApp.Models.WordViewModel
+@{
+    ViewData["Title"] = "Add word to dictionary";
+}
+
+<form asp-action="AddWordToDictionary">
+    <div class="form-actions no-color">
+        <label asp-for="Word" class="control-label">Input word:</label>
+        <input asp-for="Word" class="form-control"/>
+        <input type="submit" value="Submit" class="btn btn-default" />
+    </div>
+</form>
+@if (Model != null)
+{
+    <p>@Model.Message</p>
+}
