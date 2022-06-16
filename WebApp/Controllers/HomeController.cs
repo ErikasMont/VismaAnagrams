@@ -84,4 +84,9 @@ public class HomeController : Controller
         model.Message = "Word is already in the dictionary";
         return View("AddWordToDictionary", model);
     }
+
+    public IActionResult BrowserStorageValuesList()
+    {
+        return View();
+    }
 }
