@@ -20,6 +20,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
 var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
+var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
 
-var ui = new UI(host.Services.GetRequiredService<IAnagramSolver>(), anagramCount, minInputLength);
-await ui.Run();
+var ui = new UI(host.Services.GetRequiredService<IAnagramSolver>(), anagramCount, minInputLength, anagramApiClientUrl);
+await ui.RunAsync();

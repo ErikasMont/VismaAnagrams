@@ -7,25 +7,25 @@ namespace Cli;
 
 public class UI
 {
-    private IAnagramSolver _anagramSolver;
-    private readonly ApiHelper _anagramsApi;
+    private readonly IAnagramSolver _anagramSolver;
+    private readonly AnagramApiClient _anagramsAnagramApi;
     private int _anagramsCount;
     private int _minLength;
-    public UI(IAnagramSolver anagramSolver, int anagramsCount, int minLength)
+    public UI(IAnagramSolver anagramSolver, int anagramsCount, int minLength, string anagramApiUrl)
     {
         _anagramSolver = anagramSolver;
         _anagramsCount = anagramsCount;
         _minLength = minLength;
-        _anagramsApi = new ApiHelper();
+        _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
     }
 
-    public async Task Run()
+    public async Task RunAsync()
     {
         var flag = true;
         Console.WriteLine("Hello! Welcome to anagram solver app");
         while (flag)
         {
-            await UserInput();
+            await UserInputAsync();
             flag = ExitChoice();
             if (!flag)
             {
@@ -34,26 +34,30 @@ public class UI
         }
     }
 
-    private async Task UserInput()
+    private async Task UserInputAsync()
     {
         Console.WriteLine("To find anagrams for a sentence separate the words using a space e.g (labas rytas)");
         Console.WriteLine("Please type in the words that you would like to get an anagram for: ");
         var word = Console.ReadLine();
-        if (word == null)
+        if (string.IsNullOrEmpty(word))
         {
             Console.WriteLine("No word given. Try again.");
+            return;
         }
 
-        var responseBody = await _anagramsApi.GetAnagramsRequest(word);
+        var responseBody = await _anagramsAnagramApi.GetAnagramsRequestAsync(word);
+        var anagrams = new List<Anagram>();
         try
         {
-            var anagrams = JsonSerializer.Deserialize<List<Anagram>>(responseBody);
-            PrintAnagrams(anagrams);
+            anagrams = JsonSerializer.Deserialize<List<Anagram>>(responseBody);
         }
         catch (Exception ex)
         {
             Console.WriteLine(responseBody);
+            return;
         }
+        
+        PrintAnagrams(anagrams);
     }
 
     private bool ExitChoice()
