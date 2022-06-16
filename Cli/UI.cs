@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Cli.Helpers;
 using Contracts.Interfaces;
 using Contracts.Models;
 
@@ -5,23 +7,25 @@ namespace Cli;
 
 public class UI
 {
-    private IAnagramSolver _anagramSolver;
+    private readonly IAnagramSolver _anagramSolver;
+    private readonly AnagramApiClient _anagramsAnagramApi;
     private int _anagramsCount;
     private int _minLength;
-    public UI(IAnagramSolver anagramSolver, int anagramsCount, int minLength)
+    public UI(IAnagramSolver anagramSolver, int anagramsCount, int minLength, string anagramApiUrl)
     {
         _anagramSolver = anagramSolver;
         _anagramsCount = anagramsCount;
         _minLength = minLength;
+        _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
     }
 
-    public void Run()
+    public async Task RunAsync()
     {
         var flag = true;
         Console.WriteLine("Hello! Welcome to anagram solver app");
         while (flag)
         {
-            UserInput();
+            await UserInputAsync();
             flag = ExitChoice();
             if (!flag)
             {
@@ -30,7 +34,7 @@ public class UI
         }
     }
 
-    private void UserInput()
+    private async Task UserInputAsync()
     {
         Console.WriteLine("To find anagrams for a sentence separate the words using a space e.g (labas rytas)");
         Console.WriteLine("Please type in the words that you would like to get an anagram for: ");
@@ -38,23 +42,22 @@ public class UI
         if (string.IsNullOrEmpty(word))
         {
             Console.WriteLine("No word given. Try again.");
+            return;
         }
-        else if(word.Length < _minLength)
+
+        var responseBody = await _anagramsAnagramApi.GetAnagramsRequestAsync(word);
+        var anagrams = new List<Anagram>();
+        try
         {
-            Console.WriteLine("The word was too short. You need to enter a word that has at least {0} characters.", _minLength);
+            anagrams = JsonSerializer.Deserialize<List<Anagram>>(responseBody);
         }
-        else
+        catch (Exception ex)
         {
-            var anagrams = _anagramSolver.GetAnagrams(word, _anagramsCount);
-            if (anagrams.Any())
-            {
-                PrintAnagrams(anagrams);
-            }
-            else
-            {
-                Console.WriteLine("No anagrams were found for the given words.");
-            }
+            Console.WriteLine(responseBody);
+            return;
         }
+        
+        PrintAnagrams(anagrams);
     }
 
     private bool ExitChoice()
@@ -78,5 +81,4 @@ public class UI
         }
         Console.WriteLine();
     }
-    
 }
