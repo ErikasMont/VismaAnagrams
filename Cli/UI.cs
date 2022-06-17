@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BusinessLogic.Services;
 using Cli.Helpers;
 using Contracts.Interfaces;
 using Contracts.Models;
@@ -7,13 +8,13 @@ namespace Cli;
 
 public class UI
 {
-    private readonly IAnagramSolver _anagramSolver;
+    private readonly IWordService _wordService;
     private readonly AnagramApiClient _anagramsAnagramApi;
     private int _anagramsCount;
     private int _minLength;
-    public UI(IAnagramSolver anagramSolver, int anagramsCount, int minLength, string anagramApiUrl)
+    public UI(IWordService wordService, int anagramsCount, int minLength, string anagramApiUrl)
     {
-        _anagramSolver = anagramSolver;
+        _wordService = wordService;
         _anagramsCount = anagramsCount;
         _minLength = minLength;
         _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
@@ -23,6 +24,12 @@ public class UI
     {
         var flag = true;
         Console.WriteLine("Hello! Welcome to anagram solver app");
+        var transfer = TrasferChoice();
+        if (transfer)
+        {
+            _wordService.TransferWords();
+        }
+        
         while (flag)
         {
             await UserInputAsync();
@@ -68,6 +75,18 @@ public class UI
         return choice switch
         {
             "n" => true,
+            _ => false
+        };
+    }
+
+    private bool TrasferChoice()
+    {
+        Console.WriteLine("Transfer files to database? (y/n)");
+        var choice = Console.ReadLine();
+
+        return choice switch
+        {
+            "y" => true,
             _ => false
         };
     }

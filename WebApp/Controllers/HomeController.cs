@@ -55,7 +55,7 @@ public class HomeController : Controller
             };
             return RedirectToAction("Index", model);
         }
-        var words = _wordRepository.ReadWords().Distinct().ToList();
+        var words = _wordRepository.ReadWords();
 
         return View("AllWordsList", PaginatedList<Word>.Create(words, pageNumber ?? 1, 100));
     }
@@ -68,7 +68,7 @@ public class HomeController : Controller
         }
 
         var inputWords = _wordService.ValidateInputWords(model.Word);
-        if (inputWords.Length is > 1)
+        if (inputWords.Length > 1)
         {
             model.Message = "You are only allowed to enter one word at the time";
             return View("AddWordToDictionary", model);

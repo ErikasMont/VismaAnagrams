@@ -35,9 +35,19 @@ public class MockWordRepo : IWordRepository
     /// <summary>
     /// Method required for interface realization
     /// </summary>
-    /// <param name="words"></param>
-    public void WriteWords(List<Word> words)
+    /// <param name="word"></param>
+    public void WriteWord(Word word)
     {
        
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public void TransferWords()
+    {
+        
     }
 }

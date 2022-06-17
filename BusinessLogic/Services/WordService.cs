@@ -11,6 +11,12 @@ public class WordService : IWordService
     {
         _wordRepository = wordRepository;
     }
+
+    public void TransferWords()
+    {
+        _wordRepository.TransferWords();
+    }
+    
     public Dictionary<string, List<Anagram>>? GetSortedWords()
     {
         var words = _wordRepository.ReadWords();
@@ -74,16 +80,24 @@ public class WordService : IWordService
 
     public bool AddWordToFile(string word)
     {
-        var words = _wordRepository.ReadWords();
-        if (words.Any(x => x.Value == word))
+        var exists = WordExists(word);
+        if (exists)
         {
             return false;
         }
-        
-        words.Add(new Word(word));
-        words = words.OrderBy(x => x.Value).ToList();
-        _wordRepository.WriteWords(words);
+        _wordRepository.WriteWord(new Word(word));
         
         return true;
+    }
+
+    public bool WordExists(string word)
+    {
+        var words = _wordRepository.ReadWords();
+        if (words.Any(x => x.Value == word))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

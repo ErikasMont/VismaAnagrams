@@ -1,4 +1,5 @@
 using BusinessLogic.DataAccess;
+using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
 using WebApp.Helpers;
@@ -9,9 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAnagramSolver, AnagramSolver>()
     .AddScoped<IWordService, WordService>()
-    .AddScoped<IWordRepository, WordDataAccess>();
+    .AddScoped<IWordRepository, WordDbAccess>();
 
 builder.Services.Configure<WordSettings>(builder.Configuration.GetSection("WordSettings"));
+builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 
 var app = builder.Build();
 
