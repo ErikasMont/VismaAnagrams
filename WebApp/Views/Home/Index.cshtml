@@ -6,8 +6,8 @@
 <form asp-action="Index">
     <div class="form-actions no-color">
         <label asp-for="SearchString" class="control-label">Search word:</label>
-        <input asp-for="SearchString" class="form-control"/>
-        <input type="submit" value="Search" class="btn btn-default" />
+        <input asp-for="SearchString" id="input" class="form-control"/>
+        <input type="submit" value="Search" class="btn btn-default" onClick="saveInputToStorage()"/>
     </div>
 </form>
 
@@ -25,3 +25,21 @@
         <p>@Model.ErrorMessage</p>
     }
 </div>
+
+<script type="text/javascript">
+    function saveInputToStorage(){
+            let value = document.getElementById("input").value
+            if(localStorage.getItem("input")){  
+                    let vals = localStorage.getItem("input").split(','); 
+                    if(! vals.includes(value)){ 
+                        vals.push(value); 
+                        vals.sort(); 
+                        localStorage.setItem("input", vals.join(',')); 
+                    }      
+                }
+            else{
+                localStorage.setItem("input",value);
+            }
+            location.reload();
+        }
+</script>
