@@ -50,4 +50,73 @@ public class MockWordRepo : IWordRepository
     {
         
     }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <param name="word"></param>
+    /// <param name="anagrams"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task AddToCache(Word word, string anagrams)
+    {
+        
+    }
+    
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    {
+        return _setNumber switch
+        {
+            1 => new List<CachedWordModel>
+            {
+                new("rega", "gera"), new("labas", "balas"), new("rytas", "tyras"),
+                new("alus", "sula")
+            },
+            2 => new List<CachedWordModel>()
+        };
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <param name="word"></param>
+    public async Task RemoveWordFromCache(Word word)
+    {
+        
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task AddToSearchHistory(SearchHistoryModel model)
+    {
+        
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<Word>> SearchWordsByFilter(string input)
+    {
+        return new List<Word>
+        {
+            new("rega"), new("visma"), new("kava"), new("alus"),
+            new("sula"), new("toli"), new("loti"), new("geras"),
+            new("keras"), new("vaga"), new("toli"), new("rimti"),
+            new("kilti"), new("likti"), new("mirti"), new("loti"),
+            new("kiloti"), new("ly"), new("tirti"), new("irti"),
+            new("kloti"), new("lyti"), new("tiras"), new("rasit"),
+            new("rasti"), new("labas"), new("rytas"), new("balas"),
+            new("tyras"), new("baslys"), new("tara"), new("ryti")
+        };
+    }
 }

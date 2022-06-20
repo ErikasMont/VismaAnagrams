@@ -26,6 +26,42 @@ public class WordService : IWordService
         var words = await _wordDbAccess.ReadWords();
         return words.Distinct().ToList();
     }
+
+    public async Task WriteWordToCache(Word word, IEnumerable<Anagram> anagrams)
+    {
+        var wordAnagrams = anagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
+        await _wordDbAccess.AddToCache(word, wordAnagrams);
+    }
+
+    public async Task<CachedWordModel> GetWordFromCache(Word word)
+    {
+        var cachedWords = await _wordDbAccess.ReadWordsFromCache();
+        var cachedWord = cachedWords.Where(x => x.Word == word.Value).ToList();
+        return cachedWord.Count == 0 ? null : cachedWord[0];
+    }
+
+    public async Task ClearCache()
+    {
+        var cachedWords = await _wordDbAccess.ReadWordsFromCache();
+        foreach (var cachedWord in cachedWords)
+        {
+            await _wordDbAccess.RemoveWordFromCache(new Word(cachedWord.Word));
+        }
+    }
+
+    public async Task AddSearch(string userIp, string searchString, List<Anagram> foundAnagrams)
+    {
+        var anagrams = foundAnagrams == null ? ""
+            : foundAnagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
+        var searchHistoryModel = new SearchHistoryModel(userIp, DateTime.Now, searchString, anagrams);
+        await _wordDbAccess.AddToSearchHistory(searchHistoryModel);
+    }
+
+    public async Task<IEnumerable<Word>> SearchWords(string input)
+    {
+        return await _wordDbAccess.SearchWordsByFilter(input);
+    } 
+    
     public async Task<Dictionary<string, List<Anagram>>> GetSortedWords()
     {
         var allWords = await _wordFileAccess.ReadWords();
