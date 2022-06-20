@@ -1,3 +1,4 @@
+using BusinessLogic.Helpers;
 using Contracts.Interfaces;
 using Contracts.Models;
 
@@ -5,21 +6,31 @@ namespace BusinessLogic.Services;
 
 public class WordService : IWordService
 {
-    private readonly IWordRepository _wordRepository;
+    private readonly IWordRepository _wordFileAccess;
+    private readonly IWordRepository _wordDbAccess;
 
-    public WordService(IWordRepository wordRepository)
+    public WordService(ServiceResolver serviceAccessor)
     {
-        _wordRepository = wordRepository;
+        _wordFileAccess = serviceAccessor("File");
+        _wordDbAccess = serviceAccessor("Db");
     }
 
-    public void TransferWords()
+    public async Task WriteWordsToDb()
     {
-        _wordRepository.TransferWords();
+        var words = await _wordFileAccess.ReadWords();
+        await _wordDbAccess.WriteWords(words);
     }
-    
-    public Dictionary<string, List<Anagram>>? GetSortedWords()
+
+    public async Task<List<Word>> GetWordsList()
     {
-        var words = _wordRepository.ReadWords();
+        var words = await _wordDbAccess.ReadWords();
+        return words.Distinct().ToList();
+    }
+    public async Task<Dictionary<string, List<Anagram>>?> GetSortedWords()
+    {
+        var allWords = await _wordFileAccess.ReadWords();
+        var words = allWords.ToList();
+        
         var sortedDictionary = new Dictionary<string, List<Anagram>>();
         if (words.Count == 0)
         {
@@ -78,26 +89,21 @@ public class WordService : IWordService
         return filteredAnagrams;
     }
 
-    public bool AddWordToFile(string word)
+    public async Task<bool> AddWordToFile(string word)
     {
-        var exists = WordExists(word);
+        var exists = await WordExists(word);
         if (exists)
         {
             return false;
         }
-        _wordRepository.WriteWord(new Word(word));
+        _wordFileAccess.WriteWord(new Word(word));
         
         return true;
     }
 
-    public bool WordExists(string word)
+    private async Task<bool> WordExists(string word)
     {
-        var words = _wordRepository.ReadWords();
-        if (words.Any(x => x.Value == word))
-        {
-            return true;
-        }
-
-        return false;
+        var words = await _wordFileAccess.ReadWords();
+        return words.Any(x => x.Value == word);
     }
 }

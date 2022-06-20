@@ -9,20 +9,17 @@ namespace WebApp.Controllers;
 public class HomeController : Controller
 {
     private readonly IAnagramSolver _anagramSolver;
-    private readonly IWordRepository _wordRepository;
     private readonly IWordService _wordService;
     private readonly WordSettings _wordSettings;
 
-    public HomeController(IAnagramSolver anagramSolver, IWordRepository wordRepository, 
-        IWordService wordService, IOptions<WordSettings> wordSettings)
+    public HomeController(IAnagramSolver anagramSolver, IWordService wordService, IOptions<WordSettings> wordSettings)
     {
         _anagramSolver = anagramSolver;
-        _wordRepository = wordRepository;
         _wordSettings = wordSettings.Value;
         _wordService = wordService;
     }
     
-    public IActionResult Index(AnagramViewModel? model)
+    public async Task<IActionResult> Index(AnagramViewModel? model)
     {
         if (model.SearchString == null)
         {
@@ -35,7 +32,7 @@ public class HomeController : Controller
             return View("Index", model);
         }
         
-        model.Anagrams = _anagramSolver.GetAnagrams(model.SearchString, _wordSettings.AnagramCount);
+        model.Anagrams = await _anagramSolver.GetAnagrams(model.SearchString, _wordSettings.AnagramCount);
         model.ErrorMessage = "";
         if (!model.Anagrams.Any())
         {
@@ -45,22 +42,22 @@ public class HomeController : Controller
         return View("Index", model);
     }
 
-    public IActionResult AllWordsList(int? pageNumber, string? searchString)
+    public async Task<IActionResult> AllWordsList(int? pageNumber, string? searchString)
     {
         if (searchString != null)
         {
-            AnagramViewModel model = new AnagramViewModel()
+            var model = new AnagramViewModel()
             {
                 SearchString = searchString
             };
             return RedirectToAction("Index", model);
         }
-        var words = _wordRepository.ReadWords();
+        var words = await _wordService.GetWordsList();
 
         return View("AllWordsList", PaginatedList<Word>.Create(words, pageNumber ?? 1, 100));
     }
 
-    public IActionResult AddWordToDictionary(WordViewModel? model)
+    public async Task<IActionResult> AddWordToDictionary(WordViewModel? model)
     {
         if (model.Word == null)
         {
@@ -74,7 +71,7 @@ public class HomeController : Controller
             return View("AddWordToDictionary", model);
         }
 
-        var successful = _wordService.AddWordToFile(inputWords[0]);
+        var successful = await _wordService.AddWordToFile(inputWords[0]);
         if (successful)
         {
             model.Message = "Word added successfully";

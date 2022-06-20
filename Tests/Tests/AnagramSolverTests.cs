@@ -1,3 +1,4 @@
+using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
 using Contracts.Models;
@@ -13,18 +14,23 @@ public class AnagramSolverTests
     [SetUp]
     public void Setup()
     {
-        _anagramSolver = new AnagramSolver( new WordService(new MockWordRepo(1)));
+        var serviceResolver = new ServiceResolver(key => key switch
+        {
+            "File" => new MockWordRepo(1),
+            "Db" => new MockWordRepo(1)
+        });
+        _anagramSolver = new AnagramSolver( new WordService(serviceResolver));
     }
 
     [TestCase("rega")]
     [TestCase("          ")]
     [TestCase("")]
     [TestCase("visma kava")]
-    public void GetAnagrams_IfInputWithoutAnagramsGiven_EmptyListOfAnagrams(string input)
+    public async Task GetAnagrams_IfInputWithoutAnagramsGiven_EmptyListOfAnagrams(string input)
     {
         var expectedCount = 0;
 
-        var anagrams = _anagramSolver.GetAnagrams(input, 2);
+        var anagrams = await _anagramSolver.GetAnagrams(input, 2);
         
         anagrams.ShouldNotBeNull();
         anagrams.Count.ShouldBe(expectedCount);
@@ -35,12 +41,12 @@ public class AnagramSolverTests
     [TestCase("geras kava", "keras vaga")]
     [TestCase("geras   kava", "keras vaga")]
     [TestCase("toli rimti kilti", "loti mirti likti")]
-    public void GetAnagrams_IfInputWithOneAnagramGiven_ListOfAnagrams(string input, string output)
+    public async Task GetAnagrams_IfInputWithOneAnagramGiven_ListOfAnagrams(string input, string output)
     {
         var expectedCount = 1;
         var expectedAnagram = new Anagram(output);
 
-        var anagrams = _anagramSolver.GetAnagrams(input, 2);
+        var anagrams = await _anagramSolver.GetAnagrams(input, 2);
         
         anagrams.ShouldNotBeNull();
         anagrams.Count.ShouldBe(expectedCount);
@@ -51,12 +57,12 @@ public class AnagramSolverTests
     [TestCase("tiras   ", new []{"rasit", "rasti"})]
     [TestCase("labas rytas", new []{"balas tyras", "baslys tara"})]
     [TestCase("toli ryti kilti", new []{"irti kloti lyti", "kiloti ly tirti"})]
-    public void GetAnagrams_IfInputWithMultipleAnagramsGiven_ListOfAnagrams(string input, string[] output)
+    public async Task GetAnagrams_IfInputWithMultipleAnagramsGiven_ListOfAnagrams(string input, string[] output)
     {
         var expectedCount = 2;
         var expectedAnagrams = output.Select(x => new Anagram(x)).ToArray();
 
-        var anagrams = _anagramSolver.GetAnagrams(input, 2);
+        var anagrams = await _anagramSolver.GetAnagrams(input, 2);
         
         anagrams.ShouldNotBeNull();
         anagrams.Count.ShouldBe(expectedCount);

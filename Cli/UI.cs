@@ -27,7 +27,7 @@ public class UI
         var transfer = TrasferChoice();
         if (transfer)
         {
-            _wordService.TransferWords();
+            _wordService.WriteWordsToDb();
         }
         
         while (flag)

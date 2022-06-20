@@ -12,12 +12,20 @@ IConfiguration config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-using IHost host = Host.CreateDefaultBuilder(args)
+using var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
         services.AddSingleton<IAnagramSolver, AnagramSolver>()
             .AddSingleton<IWordService, WordService>()
-            .AddSingleton<IWordRepository, WordFileAccess>()
-            .Configure<ConnectionStrings>(config.GetRequiredSection("ConnectionStrings")))
+            .AddSingleton<WordFileAccess>()
+            .AddSingleton<WordDbAccess>()
+            .AddSingleton<ServiceResolver>(serviceProvider => key =>
+            {
+                return key switch
+                {
+                    "File" => serviceProvider.GetService<WordFileAccess>(),
+                    "Db" => serviceProvider.GetService<WordDbAccess>()
+                };
+            }))
     .Build();
 
 var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();

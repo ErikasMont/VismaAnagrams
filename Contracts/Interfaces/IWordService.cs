@@ -4,11 +4,11 @@ namespace Contracts.Interfaces;
 
 public interface IWordService
 {
-    void TransferWords();
-    Dictionary<string, List<Anagram>>? GetSortedWords();
+    Task WriteWordsToDb();
+    Task<List<Word>> GetWordsList();
+    Task<Dictionary<string, List<Anagram>>?> GetSortedWords();
     string Alphabetize(string input);
     string[] ValidateInputWords(string input);
     List<Anagram>? RemoveDuplicates(List<Anagram> anagrams, Anagram userInput);
-    bool AddWordToFile(string word);
-    bool WordExists(string word);
+    Task<bool> AddWordToFile(string word);
 }

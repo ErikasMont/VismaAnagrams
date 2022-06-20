@@ -1,3 +1,4 @@
+using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
 using Contracts.Models;
@@ -8,32 +9,43 @@ namespace Tests.Tests;
 [TestFixture]
 public class WordServiceTests
 {
-    private IWordRepository _wordRepository;
     private IWordService _wordService;
     private IWordService _wordServiceEmpty;
     [SetUp]
     public void Setup()
     {
-        _wordRepository = new MockWordRepo(1);
-        _wordService = new WordService(_wordRepository);
-        _wordServiceEmpty = new WordService(new MockWordRepo(2));
+        var serviceResolver = new ServiceResolver(key => 
+            key switch
+            {
+                "File" => new MockWordRepo(1),
+                "Db" => new MockWordRepo(1)
+            });
+        
+        var serviceResolverEmpty = new ServiceResolver(key => 
+            key switch
+            {
+                "File" => new MockWordRepo(2),
+                "Db" => new MockWordRepo(2)
+            });
+        
+        _wordService = new WordService(serviceResolver);
+        _wordServiceEmpty = new WordService(serviceResolverEmpty);
     }
     
     [Test]
-    public void GetSortedWords_IfNoWordsRead_IsNull()
+    public async Task GetSortedWords_IfNoWordsRead_IsNull()
     {
-        var anagrams = _wordServiceEmpty.GetSortedWords();
+        var anagrams = await _wordServiceEmpty.GetSortedWords();
         
         anagrams.ShouldBeNull();
     }
     
     [Test]
-    public void GetSortedWords_IfAllWordsRead_ReturnsSortedWordDictionary()
+    public async Task GetSortedWords_IfAllWordsRead_ReturnsSortedWordDictionary()
     {
         var expectedKey = "aegr";
-        var expectedValue = new List<Anagram>(){new ("rega")};
-        
-        var sortedWords = _wordService.GetSortedWords();
+
+        var sortedWords = await _wordService.GetSortedWords();
         
         sortedWords.ShouldNotBeNull();
         sortedWords.ShouldContainKey(expectedKey);
@@ -91,21 +103,21 @@ public class WordServiceTests
     }
 
     [Test]
-    public void AddWordToFile_WhenExistingWordGiven_ReturnsFalse()
+    public async Task AddWordToFile_WhenExistingWordGiven_ReturnsFalse()
     {
         var word = "alus";
 
-        var result = _wordService.AddWordToFile(word);
+        var result = await _wordService.AddWordToFile(word);
         
         result.ShouldBeFalse();
     }
     
     [Test]
-    public void AddWordToFile_WhenNotExistingWordGiven_ReturnsTrue()
+    public async Task AddWordToFile_WhenNotExistingWordGiven_ReturnsTrue()
     {
         var word = "testas";
 
-        var result = _wordService.AddWordToFile(word);
+        var result = await _wordService.AddWordToFile(word);
         
         result.ShouldBeTrue();
     }

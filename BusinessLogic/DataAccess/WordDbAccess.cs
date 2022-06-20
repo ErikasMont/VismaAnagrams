@@ -1,99 +1,61 @@
 using System.Data;
 using System.Data.SqlClient;
-using BusinessLogic.Helpers;
 using Contracts.Interfaces;
 using Contracts.Models;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace BusinessLogic.DataAccess;
 
 public class WordDbAccess : IWordRepository
 {
-    private const string FileName = "zodynas.txt";
-    private readonly ConnectionStrings _connectionStrings;
+    private readonly string _connectionString;
+    private const string WordTableName = "dbo.word";
 
-    public WordDbAccess(IOptions<ConnectionStrings> connectionStrings)
+    public WordDbAccess(IConfiguration configuration)
     {
-        _connectionStrings = connectionStrings.Value;
+        _connectionString = configuration.GetConnectionString("AnagramsDb") ??
+                            throw new Exception("Connection string was not found.");
     }
-    
-    public List<Word> ReadWords()
+
+    public async Task<IEnumerable<Word>> ReadWords()
     {
         var words = new List<Word>();
-        var sql = "SELECT value FROM dbo.word";
-
-        try
+        var sql = "SELECT value FROM " + WordTableName;
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand(sql, connection);
+        await using var reader = command.ExecuteReader();
+        while (reader.Read())
         {
-            using (var connection = new SqlConnection(_connectionStrings.AnagramsDb))
-            {
-                connection.Open();
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var word = new Word(reader[0].ToString());
-                            words.Add(word);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            
+            var word = new Word(reader[0].ToString());
+            words.Add(word);
         }
 
         return words;
     }
 
-    public void WriteWord(Word word)
+    public async Task WriteWord(Word word)
     {
-        var sql = "INSERT INTO word VALUES(@param)";
-
-        try
-        {
-            using (var connection = new SqlConnection(_connectionStrings.AnagramsDb))
-            {
-                connection.Open();
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.Add("@param", SqlDbType.VarChar, 50).Value = word.Value;
-                    command.CommandType = CommandType.Text;
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            
-        }
+        var sql = "INSERT INTO " + WordTableName + " VALUES(@param)";
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.Add("@param", SqlDbType.VarChar, 50).Value = word.Value;
+        command.CommandType = CommandType.Text;
+        await command.ExecuteNonQueryAsync();
     }
 
-    public void TransferWords()
+    public async Task WriteWords(IEnumerable<Word> words)
     {
-        var words = ReadWords();
-
-        try
+        var sql = "INSERT INTO " + WordTableName + " VALUES(@param)";
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        foreach (var word in words)
         {
-            using (var fs = File.Open(FileName, FileMode.Append, FileAccess.Write))
-            {
-                using (var bs = new BufferedStream(fs))
-                {
-                    using (var sw = new StreamWriter(bs))
-                    {
-                        foreach (var word in words)
-                        {
-                            sw.WriteLine(word.Value);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            
+            await using var command = new SqlCommand(sql, connection);
+            command.Parameters.Add("@param", SqlDbType.VarChar, 50).Value = word.Value;
+            command.CommandType = CommandType.Text;
+            await command.ExecuteNonQueryAsync();
         }
     }
 }

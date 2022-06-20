@@ -10,10 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAnagramSolver, AnagramSolver>()
     .AddScoped<IWordService, WordService>()
-    .AddScoped<IWordRepository, WordDbAccess>();
+    .AddScoped<WordDbAccess>()
+    .AddScoped<WordFileAccess>()
+    .AddScoped<ServiceResolver>(serviceProvider => key =>
+    {
+        return key switch
+        {
+            "File" => serviceProvider.GetService<WordFileAccess>(),
+            "Db" => serviceProvider.GetService<WordDbAccess>()
+        };
+    });
 
 builder.Services.Configure<WordSettings>(builder.Configuration.GetSection("WordSettings"));
-builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 
 var app = builder.Build();
 

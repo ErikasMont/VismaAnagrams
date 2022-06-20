@@ -1,3 +1,4 @@
+using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,20 +18,24 @@ public class HomeControllerTests
     [SetUp]
     public void Setup()
     {
-        var wordRepo = new MockWordRepo(1);
-        var wordService = new WordService(wordRepo);
+        var serviceResolver = new ServiceResolver(key => key switch
+        {
+            "File" => new MockWordRepo(1),
+            "Db" => new MockWordRepo(1)
+        });
+        var wordService = new WordService(serviceResolver);
         var anagramSolver = new AnagramSolver(wordService);
         var wordSettings = Options.Create<WordSettings>(new WordSettings());
         wordSettings.Value.AnagramCount = 3;
         wordSettings.Value.MinInputLength = 4;
         
-        _homeController = new HomeController(anagramSolver, wordRepo, wordService, wordSettings);
+        _homeController = new HomeController(anagramSolver, wordService, wordSettings);
     }
 
     [Test]
-    public void Index_IfNoWordGiven_ReturnsEmptyView()
+    public async Task Index_IfNoWordGiven_ReturnsEmptyView()
     {
-        var result = _homeController.Index(new AnagramViewModel()) as ViewResult;
+        var result = await _homeController.Index(new AnagramViewModel()) as ViewResult;
         
         result.ViewName.ShouldBe("Index");
         result.Model.ShouldBeAssignableTo<AnagramViewModel>();
@@ -38,14 +43,14 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void Index_WhenTooShortWordGiven_ReturnsEmptyView()
+    public async Task Index_WhenTooShortWordGiven_ReturnsEmptyView()
     {
         var model = new AnagramViewModel
         {
             SearchString = "ad"
         };
 
-        var result = _homeController.Index(model) as ViewResult;
+        var result = await _homeController.Index(model) as ViewResult;
         model = result.Model as AnagramViewModel;
         
         result.ViewName.ShouldBe("Index");
@@ -55,14 +60,14 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void Index_IfWordWithoutAnagramsGiven_ReturnsWordAnagrams()
+    public async Task Index_IfWordWithoutAnagramsGiven_ReturnsWordAnagrams()
     {
         var model = new AnagramViewModel()
         {
             SearchString = "rega"
         };
         
-        var result = _homeController.Index(model) as ViewResult;
+        var result = await _homeController.Index(model) as ViewResult;
         model = result.Model as AnagramViewModel;
         
         result.ViewName.ShouldBe("Index");
@@ -73,14 +78,14 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void Index_IfWordWithGiven_ReturnsWordAnagrams()
+    public async Task Index_IfWordWithGiven_ReturnsWordAnagrams()
     {
         var model = new AnagramViewModel()
         {
             SearchString = "alus"
         };
         
-        var result = _homeController.Index(model) as ViewResult;
+        var result = await _homeController.Index(model) as ViewResult;
         model = result.Model as AnagramViewModel;
         
         result.ViewName.ShouldBe("Index");
@@ -91,9 +96,9 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void AllWordsList_IfNoWordWasGiven_ReturnsAPaginatedListOfWords()
+    public async Task AllWordsList_IfNoWordWasGiven_ReturnsAPaginatedListOfWords()
     {
-        var result = _homeController.AllWordsList(1, null) as ViewResult;
+        var result = await _homeController.AllWordsList(1, null) as ViewResult;
         var model = result.Model as PaginatedList<Word>;
         
         result.ViewName.ShouldBe("AllWordsList");
@@ -103,17 +108,17 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void AllWordsList_IfWordWasGiven_RedirectsToIndex()
+    public async Task AllWordsList_IfWordWasGiven_RedirectsToIndex()
     {
-        var result = _homeController.AllWordsList(1, "alus") as RedirectToActionResult;
+        var result = await _homeController.AllWordsList(1, "alus") as RedirectToActionResult;
 
         result.ActionName.ShouldBe("Index");
     }
     
     [Test]
-    public void AddWordToDictionary_IfNoWordWasGiven_ReturnsEmptyView()
+    public async Task AddWordToDictionary_IfNoWordWasGiven_ReturnsEmptyView()
     {
-        var result = _homeController.AddWordToDictionary(new WordViewModel()) as ViewResult;
+        var result = await _homeController.AddWordToDictionary(new WordViewModel()) as ViewResult;
         
         result.ViewName.ShouldBe("AddWordToDictionary");
         result.Model.ShouldBeNull();
@@ -121,13 +126,13 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void AddWordToDictionary_IfExistingWordWasGiven_ReturnsFailureMessage()
+    public async Task AddWordToDictionary_IfExistingWordWasGiven_ReturnsFailureMessage()
     {
         var model = new WordViewModel()
         {
             Word = "alus"
         };
-        var result = _homeController.AddWordToDictionary(model) as ViewResult;
+        var result = await _homeController.AddWordToDictionary(model) as ViewResult;
         model = result.Model as WordViewModel;
         
         result.ViewName.ShouldBe("AddWordToDictionary");
@@ -137,13 +142,13 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void AddWordToDictionary_IfNotExistingWordWasGiven_ReturnsSuccessMessage()
+    public async Task AddWordToDictionary_IfNotExistingWordWasGiven_ReturnsSuccessMessage()
     {
         var model = new WordViewModel()
         {
             Word = "poryt"
         };
-        var result = _homeController.AddWordToDictionary(model) as ViewResult;
+        var result = await _homeController.AddWordToDictionary(model) as ViewResult;
         model = result.Model as WordViewModel;
         
         result.ViewName.ShouldBe("AddWordToDictionary");
@@ -153,13 +158,13 @@ public class HomeControllerTests
     }
     
     [Test]
-    public void AddWordToDictionary_IfMultipleWordsWereGiven_ReturnsFailureMessage()
+    public async Task AddWordToDictionary_IfMultipleWordsWereGiven_ReturnsFailureMessage()
     {
         var model = new WordViewModel()
         {
             Word = "poryt eisime"
         };
-        var result = _homeController.AddWordToDictionary(model) as ViewResult;
+        var result = await _homeController.AddWordToDictionary(model) as ViewResult;
         model = result.Model as WordViewModel;
         
         result.ViewName.ShouldBe("AddWordToDictionary");
