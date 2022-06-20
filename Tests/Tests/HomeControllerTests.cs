@@ -20,8 +20,8 @@ public class HomeControllerTests
     {
         var serviceResolver = new ServiceResolver(key => key switch
         {
-            "File" => new MockWordRepo(1),
-            "Db" => new MockWordRepo(1)
+            RepositoryType.File => new MockWordRepo(1),
+            RepositoryType.Db => new MockWordRepo(1)
         });
         var wordService = new WordService(serviceResolver);
         var anagramSolver = new AnagramSolver(wordService);

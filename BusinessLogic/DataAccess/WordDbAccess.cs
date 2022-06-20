@@ -9,7 +9,7 @@ namespace BusinessLogic.DataAccess;
 public class WordDbAccess : IWordRepository
 {
     private readonly string _connectionString;
-    private const string WordTableName = "dbo.word";
+    private const string WordTableName = "word";
 
     public WordDbAccess(IConfiguration configuration)
     {
@@ -20,7 +20,7 @@ public class WordDbAccess : IWordRepository
     public async Task<IEnumerable<Word>> ReadWords()
     {
         var words = new List<Word>();
-        var sql = "SELECT value FROM " + WordTableName;
+        var sql = $"SELECT value FROM {WordTableName}";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(sql, connection);
@@ -36,7 +36,7 @@ public class WordDbAccess : IWordRepository
 
     public async Task WriteWord(Word word)
     {
-        var sql = "INSERT INTO " + WordTableName + " VALUES(@param)";
+        var sql = $"INSERT INTO {WordTableName} VALUES(@param)";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(sql, connection);
@@ -47,7 +47,7 @@ public class WordDbAccess : IWordRepository
 
     public async Task WriteWords(IEnumerable<Word> words)
     {
-        var sql = "INSERT INTO " + WordTableName + " VALUES(@param)";
+        var sql = $"INSERT INTO {WordTableName} VALUES(@param)";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         foreach (var word in words)

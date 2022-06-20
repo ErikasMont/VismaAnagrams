@@ -22,8 +22,8 @@ using var host = Host.CreateDefaultBuilder(args)
             {
                 return key switch
                 {
-                    "File" => serviceProvider.GetService<WordFileAccess>(),
-                    "Db" => serviceProvider.GetService<WordDbAccess>()
+                    RepositoryType.File => serviceProvider.GetService<WordFileAccess>(),
+                    RepositoryType.Db => serviceProvider.GetService<WordDbAccess>()
                 };
             }))
     .Build();

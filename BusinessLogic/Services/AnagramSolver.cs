@@ -18,7 +18,7 @@ public class AnagramSolver : IAnagramSolver
         var anagram = new Anagram(myWords);
         myWords = Regex.Replace(myWords, @"\s+", "");
         var sortedWords = await _wordService.GetSortedWords();
-        if (sortedWords == null)
+        if (sortedWords.Count == 0)
         {
             return anagrams;
         }

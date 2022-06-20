@@ -17,15 +17,15 @@ public class WordServiceTests
         var serviceResolver = new ServiceResolver(key => 
             key switch
             {
-                "File" => new MockWordRepo(1),
-                "Db" => new MockWordRepo(1)
+                RepositoryType.File => new MockWordRepo(1),
+                RepositoryType.Db => new MockWordRepo(1)
             });
         
         var serviceResolverEmpty = new ServiceResolver(key => 
             key switch
             {
-                "File" => new MockWordRepo(2),
-                "Db" => new MockWordRepo(2)
+                RepositoryType.File => new MockWordRepo(2),
+                RepositoryType.Db => new MockWordRepo(2)
             });
         
         _wordService = new WordService(serviceResolver);

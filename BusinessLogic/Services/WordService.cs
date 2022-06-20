@@ -11,8 +11,8 @@ public class WordService : IWordService
 
     public WordService(ServiceResolver serviceAccessor)
     {
-        _wordFileAccess = serviceAccessor("File");
-        _wordDbAccess = serviceAccessor("Db");
+        _wordFileAccess = serviceAccessor(RepositoryType.File);
+        _wordDbAccess = serviceAccessor(RepositoryType.Db);
     }
 
     public async Task WriteWordsToDb()
@@ -26,7 +26,7 @@ public class WordService : IWordService
         var words = await _wordDbAccess.ReadWords();
         return words.Distinct().ToList();
     }
-    public async Task<Dictionary<string, List<Anagram>>?> GetSortedWords()
+    public async Task<Dictionary<string, List<Anagram>>> GetSortedWords()
     {
         var allWords = await _wordFileAccess.ReadWords();
         var words = allWords.ToList();
@@ -34,7 +34,7 @@ public class WordService : IWordService
         var sortedDictionary = new Dictionary<string, List<Anagram>>();
         if (words.Count == 0)
         {
-            return null;
+            return sortedDictionary;
         }
         
         foreach (var word in words)
@@ -72,11 +72,11 @@ public class WordService : IWordService
         return parts;
     }
     
-    public List<Anagram>? RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
+    public List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
     {
         if (!anagrams.Any())
         {
-            return null;
+            return anagrams;
         }
         
         var filteredAnagrams = anagrams.Distinct().ToList();
@@ -96,7 +96,7 @@ public class WordService : IWordService
         {
             return false;
         }
-        _wordFileAccess.WriteWord(new Word(word));
+        await _wordFileAccess.WriteWord(new Word(word));
         
         return true;
     }

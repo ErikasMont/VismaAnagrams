@@ -16,8 +16,8 @@ public class AnagramSolverTests
     {
         var serviceResolver = new ServiceResolver(key => key switch
         {
-            "File" => new MockWordRepo(1),
-            "Db" => new MockWordRepo(1)
+            RepositoryType.File => new MockWordRepo(1),
+            RepositoryType.Db => new MockWordRepo(1)
         });
         _anagramSolver = new AnagramSolver( new WordService(serviceResolver));
     }

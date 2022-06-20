@@ -16,8 +16,8 @@ builder.Services.AddScoped<IAnagramSolver, AnagramSolver>()
     {
         return key switch
         {
-            "File" => serviceProvider.GetService<WordFileAccess>(),
-            "Db" => serviceProvider.GetService<WordDbAccess>()
+            RepositoryType.File => serviceProvider.GetService<WordFileAccess>(),
+            RepositoryType.Db => serviceProvider.GetService<WordDbAccess>()
         };
     });
 
