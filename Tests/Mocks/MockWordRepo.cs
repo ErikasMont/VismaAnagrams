@@ -12,7 +12,7 @@ public class MockWordRepo : IWordRepository
         _setNumber = setNumber;
     }
     
-    public List<Word> ReadWords()
+    public async Task<IEnumerable<Word>> ReadWords()
     {
         return _setNumber switch
         {
@@ -35,9 +35,19 @@ public class MockWordRepo : IWordRepository
     /// <summary>
     /// Method required for interface realization
     /// </summary>
-    /// <param name="words"></param>
-    public void WriteWords(List<Word> words)
+    /// <param name="word"></param>
+    public async Task WriteWord(Word word)
     {
        
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task WriteWords(IEnumerable<Word> words)
+    {
+        
     }
 }

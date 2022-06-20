@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,12 @@ public class AnagramControllerTests
     [SetUp]
     public void Setup()
     {
-        var wordRepo = new MockWordRepo(1);
-        var wordService = new WordService(wordRepo);
+        var serviceResolver = new ServiceResolver(key => key switch
+        {
+            RepositoryType.File => new MockWordRepo(1),
+            RepositoryType.Db => new MockWordRepo(1)
+        });
+        var wordService = new WordService(serviceResolver);
         var anagramSolver = new AnagramSolver(wordService);
         var wordSettings = Options.Create<WordSettings>(new WordSettings());
         wordSettings.Value.AnagramCount = 3;
@@ -28,36 +33,36 @@ public class AnagramControllerTests
     }
 
     [Test]
-    public void GetAnagrams_WhenInputIsTooShort_ReturnsBadRequestStatusCode()
+    public async Task GetAnagrams_WhenInputIsTooShort_ReturnsBadRequestStatusCode()
     {
         var input = "alu";
         var expectedValue = "Input was too short.";
 
-        var result = _anagramController.GetAnagrams(input) as BadRequestObjectResult;
+        var result = await _anagramController.GetAnagrams(input) as BadRequestObjectResult;
 
         result.StatusCode.ShouldBe(400);
         result.Value.ShouldBe(expectedValue);
     }
     
     [Test]
-    public void GetAnagrams_WhenNoAnagramsFoundWithGivenInput_ReturnsNotFoundStatusCode()
+    public async Task GetAnagrams_WhenNoAnagramsFoundWithGivenInput_ReturnsNotFoundStatusCode()
     {
         var input = "ryti";
         var expectedValue = "No anagrams found with given input.";
 
-        var result = _anagramController.GetAnagrams(input) as NotFoundObjectResult;
+        var result = await _anagramController.GetAnagrams(input) as NotFoundObjectResult;
 
         result.StatusCode.ShouldBe(404);
         result.Value.ShouldBe(expectedValue);
     }
     
     [Test]
-    public void GetAnagrams_WhenAnagramsFoundWithGivenInput_ReturnsOkStatusCode()
+    public async Task GetAnagrams_WhenAnagramsFoundWithGivenInput_ReturnsOkStatusCode()
     {
         var input = "alus";
         var expectedValue = JsonSerializer.Serialize(new List<Anagram>() { new ("sula") });
 
-        var result = _anagramController.GetAnagrams(input) as OkObjectResult;
+        var result = await _anagramController.GetAnagrams(input) as OkObjectResult;
 
         result.StatusCode.ShouldBe(200);
         result.Value.ShouldBe(expectedValue);

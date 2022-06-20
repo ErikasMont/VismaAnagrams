@@ -12,13 +12,13 @@ public class AnagramSolver : IAnagramSolver
     {
         _wordService = wordService;
     }
-    public List<Anagram> GetAnagrams(string myWords, int numberOfAnagrams)
+    public async Task<List<Anagram>> GetAnagrams(string myWords, int numberOfAnagrams)
     {
         var anagrams = new List<Anagram>();
         var anagram = new Anagram(myWords);
         myWords = Regex.Replace(myWords, @"\s+", "");
-        var sortedWords = _wordService.GetSortedWords();
-        if (sortedWords == null)
+        var sortedWords = await _wordService.GetSortedWords();
+        if (sortedWords.Count == 0)
         {
             return anagrams;
         }

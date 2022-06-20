@@ -20,14 +20,14 @@ public class AnagramController : ControllerBase
     }
     
     [HttpGet]
-    public IActionResult GetAnagrams(string input)
+    public async Task<IActionResult> GetAnagrams(string input)
     {
         if (input.Length < _wordSettings.MinInputLength)
         {
             return BadRequest("Input was too short.");
         }
         
-        var anagrams = _anagramSolver.GetAnagrams(input, _wordSettings.AnagramCount);
+        var anagrams = await _anagramSolver.GetAnagrams(input, _wordSettings.AnagramCount);
         if (anagrams.Count == 0)
         {
             return NotFound("No anagrams found with given input.");

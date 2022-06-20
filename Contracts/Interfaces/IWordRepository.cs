@@ -4,6 +4,7 @@ namespace Contracts.Interfaces;
 
 public interface IWordRepository
 {
-     List<Word> ReadWords();
-     void WriteWords(List<Word> words);
+     Task<IEnumerable<Word>> ReadWords();
+     Task WriteWord(Word word);
+     Task WriteWords(IEnumerable<Word> words);
 }

@@ -1,3 +1,4 @@
+using BusinessLogic.Helpers;
 using Contracts.Interfaces;
 using Contracts.Models;
 
@@ -5,19 +6,35 @@ namespace BusinessLogic.Services;
 
 public class WordService : IWordService
 {
-    private readonly IWordRepository _wordRepository;
+    private readonly IWordRepository _wordFileAccess;
+    private readonly IWordRepository _wordDbAccess;
 
-    public WordService(IWordRepository wordRepository)
+    public WordService(ServiceResolver serviceAccessor)
     {
-        _wordRepository = wordRepository;
+        _wordFileAccess = serviceAccessor(RepositoryType.File);
+        _wordDbAccess = serviceAccessor(RepositoryType.Db);
     }
-    public Dictionary<string, List<Anagram>>? GetSortedWords()
+
+    public async Task WriteWordsToDb()
     {
-        var words = _wordRepository.ReadWords();
+        var words = await _wordFileAccess.ReadWords();
+        await _wordDbAccess.WriteWords(words);
+    }
+
+    public async Task<List<Word>> GetWordsList()
+    {
+        var words = await _wordDbAccess.ReadWords();
+        return words.Distinct().ToList();
+    }
+    public async Task<Dictionary<string, List<Anagram>>> GetSortedWords()
+    {
+        var allWords = await _wordFileAccess.ReadWords();
+        var words = allWords.ToList();
+        
         var sortedDictionary = new Dictionary<string, List<Anagram>>();
         if (words.Count == 0)
         {
-            return null;
+            return sortedDictionary;
         }
         
         foreach (var word in words)
@@ -55,11 +72,11 @@ public class WordService : IWordService
         return parts;
     }
     
-    public List<Anagram>? RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
+    public List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
     {
         if (!anagrams.Any())
         {
-            return null;
+            return anagrams;
         }
         
         var filteredAnagrams = anagrams.Distinct().ToList();
@@ -72,18 +89,21 @@ public class WordService : IWordService
         return filteredAnagrams;
     }
 
-    public bool AddWordToFile(string word)
+    public async Task<bool> AddWordToFile(string word)
     {
-        var words = _wordRepository.ReadWords();
-        if (words.Any(x => x.Value == word))
+        var exists = await WordExists(word);
+        if (exists)
         {
             return false;
         }
-        
-        words.Add(new Word(word));
-        words = words.OrderBy(x => x.Value).ToList();
-        _wordRepository.WriteWords(words);
+        await _wordFileAccess.WriteWord(new Word(word));
         
         return true;
+    }
+
+    private async Task<bool> WordExists(string word)
+    {
+        var words = await _wordFileAccess.ReadWords();
+        return words.Any(x => x.Value == word);
     }
 }
