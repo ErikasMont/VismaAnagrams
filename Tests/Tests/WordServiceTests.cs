@@ -33,11 +33,11 @@ public class WordServiceTests
     }
     
     [Test]
-    public async Task GetSortedWords_IfNoWordsRead_IsNull()
+    public async Task GetSortedWords_IfNoWordsRead_EmptyDictionaryReturned()
     {
         var anagrams = await _wordServiceEmpty.GetSortedWords();
         
-        anagrams.ShouldBeNull();
+        anagrams.ShouldBeEmpty();
     }
     
     [Test]
@@ -78,11 +78,11 @@ public class WordServiceTests
     }
     
     [Test]
-    public void RemoveDuplicates_IfEmptyListWasGiven_IsNull()
+    public void RemoveDuplicates_IfEmptyListWasGiven_EmptyListReturned()
     {
         var output = _wordService.RemoveDuplicates(new List<Anagram>(), new Anagram("test"));
         
-        output.ShouldBeNull();
+        output.ShouldBeEmpty();
     }
     
     [Test]
@@ -121,4 +121,16 @@ public class WordServiceTests
         
         result.ShouldBeTrue();
     }
+
+    [Test]
+    public async Task GetWordsList_Always_ReturnsAListOfWords()
+    {
+        var expectedCount = 30;
+        
+        var words = await _wordService.GetWordsList();
+        
+        words.Count.ShouldBe(expectedCount);
+    }
+    
+    
 }

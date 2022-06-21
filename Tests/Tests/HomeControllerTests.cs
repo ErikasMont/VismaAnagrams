@@ -1,6 +1,8 @@
+using System.Net;
 using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tests.Mocks;
@@ -14,6 +16,7 @@ namespace Tests.Tests;
 public class HomeControllerTests
 {
     private HomeController _homeController;
+    private HttpContextAccessor _accessor;
     
     [SetUp]
     public void Setup()
@@ -30,6 +33,11 @@ public class HomeControllerTests
         wordSettings.Value.MinInputLength = 4;
         
         _homeController = new HomeController(anagramSolver, wordService, wordSettings);
+        _homeController.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        _homeController.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Any;
     }
 
     [Test]
@@ -64,7 +72,7 @@ public class HomeControllerTests
     {
         var model = new AnagramViewModel()
         {
-            SearchString = "rega"
+            SearchString = "visma"
         };
         
         var result = await _homeController.Index(model) as ViewResult;

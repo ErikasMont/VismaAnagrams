@@ -26,7 +26,8 @@ public class HomeController : Controller
             return View("Index");
         }
 
-        var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+        var userIp = HttpContext.Connection.RemoteIpAddress == null
+            ? "" : HttpContext.Connection.RemoteIpAddress?.ToString();
         if (model.SearchString.Length < _wordSettings.MinInputLength)
         {
             await _wordService.AddSearch(userIp, model.SearchString,
