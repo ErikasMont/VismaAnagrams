@@ -118,10 +118,11 @@ public class WordDbAccess : IWordRepository
     public async Task<IEnumerable<Word>> SearchWordsByFilter(string input)
     {
         var foundWords = new List<Word>();
-        var sql = $"SELECT value FROM {WordTableName} WHERE value LIKE '%{input}%'";
+        var sql = $"SELECT value FROM {WordTableName} WHERE value LIKE @input";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(sql, connection);
+        command.Parameters.Add("@input", SqlDbType.VarChar).Value = $"'%{input}%'";
         await using var reader = await command.ExecuteReaderAsync();
         while (reader.Read())
         {

@@ -131,6 +131,33 @@ public class WordServiceTests
         
         words.Count.ShouldBe(expectedCount);
     }
-    
-    
+
+    [Test]
+    public async Task GetWordFromCache_IfNoWordFound_ReturnsNull()
+    {
+        var result = await _wordService.GetWordFromCache(new Word("toli"));
+        
+        result.ShouldBeNull();
+    }
+
+    [Test]
+    public async Task GetWordFromCache_IfWordFound_ReturnsCachedWordModel()
+    {
+        var expectedAnagrams = "balas";
+
+        var result = await _wordService.GetWordFromCache(new Word("labas"));
+
+        result.ShouldNotBeNull();
+        result.Anagrams.ShouldBe(expectedAnagrams);
+    }
+
+    [Test]
+    public async Task SearchWords_Always_ReturnsAListOfWordsByGivenFilter()
+    {
+        var expectedWord = new Word("kava");
+
+        var result = await _wordService.SearchWords("ava");
+        result.ShouldNotBeEmpty();
+        result.ShouldContain(expectedWord);
+    }
 }
