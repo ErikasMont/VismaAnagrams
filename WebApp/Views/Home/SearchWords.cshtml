@@ -1,0 +1,24 @@
+@model SearchWordViewModel
+
+<form asp-action="SearchWords">
+    <div class="form-actions no-color">
+        <label asp-for="SearchString" class="control-label">Search word:</label>
+        <input asp-for="SearchString" id="input" class="form-control"/>
+        <input type="submit" value="Search" class="btn btn-default"/>
+    </div>
+</form>
+
+<div class="text-center">
+    @if (Model != null)
+    {
+        if (Model.Words != null)
+        {
+            foreach (var word in Model.Words)
+            {
+                <p>@word.Value</p>
+            }
+        }
+        
+        <p>@Model.ErrorMessage</p>
+    }
+</div>

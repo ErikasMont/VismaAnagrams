@@ -33,11 +33,11 @@ public class WordServiceTests
     }
     
     [Test]
-    public async Task GetSortedWords_IfNoWordsRead_IsNull()
+    public async Task GetSortedWords_IfNoWordsRead_EmptyDictionaryReturned()
     {
         var anagrams = await _wordServiceEmpty.GetSortedWords();
         
-        anagrams.ShouldBeNull();
+        anagrams.ShouldBeEmpty();
     }
     
     [Test]
@@ -78,11 +78,11 @@ public class WordServiceTests
     }
     
     [Test]
-    public void RemoveDuplicates_IfEmptyListWasGiven_IsNull()
+    public void RemoveDuplicates_IfEmptyListWasGiven_EmptyListReturned()
     {
         var output = _wordService.RemoveDuplicates(new List<Anagram>(), new Anagram("test"));
         
-        output.ShouldBeNull();
+        output.ShouldBeEmpty();
     }
     
     [Test]
@@ -120,5 +120,44 @@ public class WordServiceTests
         var result = await _wordService.AddWordToFile(word);
         
         result.ShouldBeTrue();
+    }
+
+    [Test]
+    public async Task GetWordsList_Always_ReturnsAListOfWords()
+    {
+        var expectedCount = 30;
+        
+        var words = await _wordService.GetWordsList();
+        
+        words.Count.ShouldBe(expectedCount);
+    }
+
+    [Test]
+    public async Task GetWordFromCache_IfNoWordFound_ReturnsNull()
+    {
+        var result = await _wordService.GetWordFromCache(new Word("toli"));
+        
+        result.ShouldBeNull();
+    }
+
+    [Test]
+    public async Task GetWordFromCache_IfWordFound_ReturnsCachedWordModel()
+    {
+        var expectedAnagrams = "balas";
+
+        var result = await _wordService.GetWordFromCache(new Word("labas"));
+
+        result.ShouldNotBeNull();
+        result.Anagrams.ShouldBe(expectedAnagrams);
+    }
+
+    [Test]
+    public async Task SearchWords_Always_ReturnsAListOfWordsByGivenFilter()
+    {
+        var expectedWord = new Word("kava");
+
+        var result = await _wordService.SearchWords("ava");
+        result.ShouldNotBeEmpty();
+        result.ShouldContain(expectedWord);
     }
 }
