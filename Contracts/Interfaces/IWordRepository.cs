@@ -4,12 +4,12 @@ namespace Contracts.Interfaces;
 
 public interface IWordRepository
 {
-     Task<IEnumerable<Word>> ReadWords();
-     Task WriteWord(Word word);
-     Task WriteWords(IEnumerable<Word> words);
-     Task AddToCache(Word word, string anagrams);
+     Task<IEnumerable<WordModel>> ReadWords();
+     Task WriteWord(WordModel wordModel);
+     Task WriteWords(IEnumerable<WordModel> words);
+     Task AddToCache(WordModel wordModel, string anagrams);
      Task<IEnumerable<CachedWordModel>> ReadWordsFromCache();
-     Task RemoveWordFromCache(Word word);
+     Task RemoveWordFromCache(WordModel wordModel);
      Task AddToSearchHistory(SearchHistoryModel model);
-     Task<IEnumerable<Word>> SearchWordsByFilter(string input);
+     Task<IEnumerable<WordModel>> SearchWordsByFilter(string input);
 }

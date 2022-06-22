@@ -107,11 +107,11 @@ public class HomeControllerTests
     public async Task AllWordsList_IfNoWordWasGiven_ReturnsAPaginatedListOfWords()
     {
         var result = await _homeController.AllWordsList(1, null) as ViewResult;
-        var model = result.Model as PaginatedList<Word>;
+        var model = result.Model as PaginatedList<WordModel>;
         
         result.ViewName.ShouldBe("AllWordsList");
         result.Model.ShouldNotBeNull();
-        result.Model.ShouldBeAssignableTo<PaginatedList<Word>>();
+        result.Model.ShouldBeAssignableTo<PaginatedList<WordModel>>();
         model.Count.ShouldBe(30);
     }
     

@@ -53,10 +53,10 @@ public class UI
         }
 
         var responseBody = await _anagramsAnagramApi.GetAnagramsRequestAsync(word);
-        var anagrams = new List<Anagram>();
+        var anagrams = new List<AnagramModel>();
         try
         {
-            anagrams = JsonSerializer.Deserialize<List<Anagram>>(responseBody);
+            anagrams = JsonSerializer.Deserialize<List<AnagramModel>>(responseBody);
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ public class UI
         };
     }
 
-    private void PrintAnagrams(List<Anagram> anagrams)
+    private void PrintAnagrams(List<AnagramModel> anagrams)
     {
         Console.Write("Anagrams: ");
         foreach (var anagram in anagrams)

@@ -12,10 +12,10 @@ public class AnagramSolver : IAnagramSolver
     {
         _wordService = wordService;
     }
-    public async Task<List<Anagram>> GetAnagrams(string myWords, int numberOfAnagrams)
+    public async Task<List<AnagramModel>> GetAnagrams(string myWords, int numberOfAnagrams)
     {
-        var anagrams = new List<Anagram>();
-        var anagram = new Anagram(myWords);
+        var anagrams = new List<AnagramModel>();
+        var anagram = new AnagramModel(myWords);
         myWords = Regex.Replace(myWords, @"\s+", "");
         var sortedWords = await _wordService.GetSortedWords();
         if (sortedWords.Count == 0)
@@ -32,7 +32,7 @@ public class AnagramSolver : IAnagramSolver
         
         if (parts.Length > 1)
         {
-            var inputWords = parts.Select(x => new Anagram(x)).ToList();
+            var inputWords = parts.Select(x => new AnagramModel(x)).ToList();
 
             anagrams = GetSentenceAnagrams(sortedWords, inputWords, myWords, numberOfAnagrams);
             
@@ -44,7 +44,7 @@ public class AnagramSolver : IAnagramSolver
 
         if (!sortedWords.TryGetValue(inputKey, out anagrams))
         {
-            return new List<Anagram>();
+            return new List<AnagramModel>();
         }
         
         if (anagrams.Count == 0)
@@ -55,7 +55,7 @@ public class AnagramSolver : IAnagramSolver
         var filteredAnagrams = _wordService.RemoveDuplicates(anagrams, anagram);
         if (filteredAnagrams == null || filteredAnagrams.Count == 0)
         {
-            return new List<Anagram>();
+            return new List<AnagramModel>();
         }
         
         if (filteredAnagrams.Count < numberOfAnagrams)
@@ -66,10 +66,10 @@ public class AnagramSolver : IAnagramSolver
         return filteredAnagrams.GetRange(0, numberOfAnagrams);
     }
 
-    private List<Anagram> GetSentenceAnagrams(Dictionary<string, List<Anagram>> sortedWords, List<Anagram> inputWords, 
+    private List<AnagramModel> GetSentenceAnagrams(Dictionary<string, List<AnagramModel>> sortedWords, List<AnagramModel> inputWords, 
         string myWords, int numberOfAnagrams)
     {
-        var anagram = new Anagram(myWords);
+        var anagram = new AnagramModel(myWords);
 
         var sortedWord = _wordService.Alphabetize(myWords);
         var keys = sortedWords.Keys.ToList();
@@ -84,7 +84,7 @@ public class AnagramSolver : IAnagramSolver
 
         if (anagrams == null)
         {
-            return new List<Anagram>();
+            return new List<AnagramModel>();
         }
         
         if (anagrams.Count < numberOfAnagrams)
@@ -95,9 +95,9 @@ public class AnagramSolver : IAnagramSolver
         return anagrams.GetRange(0, numberOfAnagrams);
     }
 
-    private List<Anagram> FindSentenceContainingKeys(List<string> keys, string sortedWord)
+    private List<AnagramModel> FindSentenceContainingKeys(List<string> keys, string sortedWord)
     {
-        var sentenceContainingKeys = new List<Anagram>();
+        var sentenceContainingKeys = new List<AnagramModel>();
         foreach (var key in keys)
         {
             var keyLetters = key.ToCharArray();
@@ -117,25 +117,25 @@ public class AnagramSolver : IAnagramSolver
 
             if (containedLetters == key.Length)
             {
-                sentenceContainingKeys.Add(new Anagram(key));
+                sentenceContainingKeys.Add(new AnagramModel(key));
             }
         }
 
         return sentenceContainingKeys;
     }
 
-    private List<List<Anagram>> FindSentenceAnagramKeys(List<Anagram> sentenceContainingKeys, string sortedWord, int wordsCount)
+    private List<List<AnagramModel>> FindSentenceAnagramKeys(List<AnagramModel> sentenceContainingKeys, string sortedWord, int wordsCount)
     {
-        var utilList = new List<Anagram>();
-        var sentenceAnagramKeys = new List<List<Anagram>>();
+        var utilList = new List<AnagramModel>();
+        var sentenceAnagramKeys = new List<List<AnagramModel>>();
         SentenceKeysSearch(sentenceContainingKeys, sentenceAnagramKeys, utilList,
             0, 0, wordsCount, sortedWord);
 
         return sentenceAnagramKeys;
     }
 
-    private void SentenceKeysSearch(List<Anagram> sentenceContainingKeys, List<List<Anagram>> sentenceAnagramKeys,
-        List<Anagram> utilList, int currentIndex, int currentLoop, int loops, string sortedWord)
+    private void SentenceKeysSearch(List<AnagramModel> sentenceContainingKeys, List<List<AnagramModel>> sentenceAnagramKeys,
+        List<AnagramModel> utilList, int currentIndex, int currentLoop, int loops, string sortedWord)
     {
         if (currentLoop == loops - 1)
         {
@@ -167,13 +167,13 @@ public class AnagramSolver : IAnagramSolver
         }
     }
 
-    private List<Anagram> FindAnagramSentences(List<List<Anagram>> correctAnagrams,
-        Dictionary<string, List<Anagram>> sortedWords, List<Anagram> inputWords)
+    private List<AnagramModel> FindAnagramSentences(List<List<AnagramModel>> correctAnagrams,
+        Dictionary<string, List<AnagramModel>> sortedWords, List<AnagramModel> inputWords)
     {
-        var anagrams = new List<Anagram>();
+        var anagrams = new List<AnagramModel>();
         foreach (var pair in correctAnagrams)
         {
-            var utilList = new List<Anagram>();
+            var utilList = new List<AnagramModel>();
             AnagramSentencesSearch(anagrams, pair, sortedWords,
                 inputWords, utilList, 0, 0, pair.Count);
         }
@@ -181,15 +181,15 @@ public class AnagramSolver : IAnagramSolver
         return anagrams;
     }
 
-    private void AnagramSentencesSearch(List<Anagram> anagrams, List<Anagram> keySentence, 
-        Dictionary<string, List<Anagram>> sortedWords, List<Anagram> inputWords, List<Anagram> utilList,
+    private void AnagramSentencesSearch(List<AnagramModel> anagrams, List<AnagramModel> keySentence, 
+        Dictionary<string, List<AnagramModel>> sortedWords, List<AnagramModel> inputWords, List<AnagramModel> utilList,
         int currentIndex, int currentLoop, int loops)
     {
         if (currentLoop == loops - 1)
         {
             for (var i = currentIndex; i < keySentence.Count; i++)
             {
-                var sentence = new Anagram("");
+                var sentence = new AnagramModel("");
                 foreach (var anagram in utilList)
                 {
                     sentence.Word += anagram.Word + " ";

@@ -60,7 +60,7 @@ public class AnagramControllerTests
     public async Task GetAnagrams_WhenAnagramsFoundWithGivenInput_ReturnsOkStatusCode()
     {
         var input = "alus";
-        var expectedValue = JsonSerializer.Serialize(new List<Anagram>() { new ("sula") });
+        var expectedValue = JsonSerializer.Serialize(new List<AnagramModel>() { new ("sula") });
 
         var result = await _anagramController.GetAnagrams(input) as OkObjectResult;
 

@@ -5,6 +5,6 @@ namespace WebApp.Models;
 public class SearchWordViewModel
 {
     public string SearchString { get; set; }
-    public List<Word> Words { get; set; }
+    public List<WordModel> Words { get; set; }
     public string ErrorMessage { get; set; }
 }

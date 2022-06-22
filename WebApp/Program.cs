@@ -2,22 +2,27 @@ using BusinessLogic.DataAccess;
 using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
+using EF.DatabaseFirst.DataAccess;
+using EF.DatabaseFirst.Models;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IAnagramSolver, AnagramSolver>()
+var connectionString = builder.Configuration.GetConnectionString("AnagramsDb");
+builder.Services.AddDbContext<AnagramsDbContext>(option => option.UseSqlServer(connectionString))
+    .AddScoped<IAnagramSolver, AnagramSolver>()
     .AddScoped<IWordService, WordService>()
-    .AddScoped<WordDbAccess>()
+    .AddScoped<WordEfDbAccess>()
     .AddScoped<WordFileAccess>()
     .AddScoped<ServiceResolver>(serviceProvider => key =>
     {
         return key switch
         {
             RepositoryType.File => serviceProvider.GetService<WordFileAccess>(),
-            RepositoryType.Db => serviceProvider.GetService<WordDbAccess>()
+            RepositoryType.Db => serviceProvider.GetService<WordEfDbAccess>()
         };
     });
 
