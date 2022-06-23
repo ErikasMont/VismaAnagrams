@@ -19,9 +19,9 @@ public class WordDbAccess : IWordRepository
                             throw new Exception("Connection string was not found.");
     }
 
-    public async Task<IEnumerable<WordModel>> ReadWords()
+    public async Task<IEnumerable<Word>> ReadWords()
     {
-        var words = new List<WordModel>();
+        var words = new List<Word>();
         var sql = $"SELECT value FROM {WordTableName}";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -30,25 +30,25 @@ public class WordDbAccess : IWordRepository
         while (reader.Read())
         {
             var wordFromDb = reader[0].ToString();
-            var word = new WordModel(wordFromDb);
+            var word = new Word(wordFromDb);
             words.Add(word);
         }
 
         return words;
     }
 
-    public async Task WriteWord(WordModel wordModel)
+    public async Task WriteWord(Word word)
     {
         var sql = $"INSERT INTO {WordTableName} VALUES(@param)";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(sql, connection);
-        command.Parameters.Add("@param", SqlDbType.VarChar, 50).Value = wordModel.Value;
+        command.Parameters.Add("@param", SqlDbType.VarChar, 50).Value = word.Value;
         command.CommandType = CommandType.Text;
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task WriteWords(IEnumerable<WordModel> words)
+    public async Task WriteWords(IEnumerable<Word> words)
     {
         var sql = $"INSERT INTO {WordTableName} VALUES(@param)";
         await using var connection = new SqlConnection(_connectionString);
@@ -62,21 +62,21 @@ public class WordDbAccess : IWordRepository
         }
     }
 
-    public async Task AddToCache(WordModel wordModel, string anagrams)
+    public async Task AddToCache(Word word, string anagrams)
     {
         var sql = $"INSERT INTO {WordCacheTableName} VALUES(@word, @anagrams)";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(sql, connection);
-        command.Parameters.Add("@word", SqlDbType.VarChar, 50).Value = wordModel.Value;
+        command.Parameters.Add("@word", SqlDbType.VarChar, 50).Value = word.Value;
         command.Parameters.Add("@anagrams", SqlDbType.VarChar, 250).Value = anagrams;
         command.CommandType = CommandType.Text;
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
-        var words = new List<CachedWordModel>();
+        var words = new List<CachedWord>();
         var sql = $"SELECT word, anagrams FROM {WordCacheTableName}";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -86,25 +86,25 @@ public class WordDbAccess : IWordRepository
         {
             var word = reader[0].ToString();
             var anagrams = reader[1].ToString();
-            var cachedWord = new CachedWordModel(word, anagrams);
+            var cachedWord = new CachedWord(word, anagrams);
             words.Add(cachedWord);
         }
 
         return words;
     }
 
-    public async Task RemoveWordFromCache(WordModel wordModel)
+    public async Task RemoveWordFromCache(Word word)
     {
         var spName = "spRemoveCachedWord";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await using var command = new SqlCommand(spName, connection);
-        command.Parameters.Add("@givenWord", SqlDbType.VarChar, 50).Value = wordModel.Value;
+        command.Parameters.Add("@givenWord", SqlDbType.VarChar, 50).Value = word.Value;
         command.CommandType = CommandType.StoredProcedure;
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         var sql = $"INSERT INTO {SearchHistoryTableName} VALUES(@userip, @searchdate, @searchstring, @foundanagrams)";
         await using var connection = new SqlConnection(_connectionString);
@@ -118,9 +118,9 @@ public class WordDbAccess : IWordRepository
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task<IEnumerable<WordModel>> SearchWordsByFilter(string input)
+    public async Task<IEnumerable<Word>> SearchWordsByFilter(string input)
     {
-        var foundWords = new List<WordModel>();
+        var foundWords = new List<Word>();
         var sql = $"SELECT value FROM {WordTableName} WHERE value LIKE @input";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -130,7 +130,7 @@ public class WordDbAccess : IWordRepository
         while (reader.Read())
         {
             var wordFromDb = reader[0].ToString();
-            var word = new WordModel(wordFromDb);
+            var word = new Word(wordFromDb);
             foundWords.Add(word);
         }
 

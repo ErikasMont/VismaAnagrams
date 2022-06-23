@@ -44,7 +44,7 @@ public class AnagramSolverTests
     public async Task GetAnagrams_IfInputWithOneAnagramGiven_ListOfAnagrams(string input, string output)
     {
         var expectedCount = 1;
-        var expectedAnagram = new AnagramModel(output);
+        var expectedAnagram = new Anagram(output);
 
         var anagrams = await _anagramSolver.GetAnagrams(input, 2);
         
@@ -60,7 +60,7 @@ public class AnagramSolverTests
     public async Task GetAnagrams_IfInputWithMultipleAnagramsGiven_ListOfAnagrams(string input, string[] output)
     {
         var expectedCount = 2;
-        var expectedAnagrams = output.Select(x => new AnagramModel(x)).ToArray();
+        var expectedAnagrams = output.Select(x => new Anagram(x)).ToArray();
 
         var anagrams = await _anagramSolver.GetAnagrams(input, 2);
         

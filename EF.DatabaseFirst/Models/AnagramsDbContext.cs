@@ -35,13 +35,20 @@ namespace EF.DatabaseFirst.Models
             {
                 entity.ToTable("CachedWord");
 
+                entity.HasIndex(e => e.FkWordId, "UQ_Word_Id")
+                    .IsUnique();
+
                 entity.Property(e => e.Anagrams)
                     .HasMaxLength(250)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Word)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.FkWordId).HasColumnName("Fk_Word_Id");
+
+                entity.HasOne(d => d.FkWord)
+                    .WithOne(p => p.CachedWord)
+                    .HasForeignKey<CachedWord>(d => d.FkWordId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Fk_Word_Id");
             });
 
             modelBuilder.Entity<SearchHistory>(entity =>

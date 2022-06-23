@@ -9,9 +9,9 @@ public class WordFileAccess : IWordRepository
     private const string WordCacheFileName = "wordsFileCache.txt";
     private const string SearchHistoryFileName = "searchHistory.txt";
 
-    public async Task<IEnumerable<WordModel>> ReadWords()
+    public async Task<IEnumerable<Word>> ReadWords()
     {
-        var words = new List<WordModel>();
+        var words = new List<Word>();
         await using var fs = File.Open(DictionaryFileName, FileMode.Open, FileAccess.Read);
         await using var bs = new BufferedStream(fs);
         using var sr = new StreamReader(bs);
@@ -19,22 +19,22 @@ public class WordFileAccess : IWordRepository
         while ((line = await sr.ReadLineAsync()) != null)
         {
             var parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
-            var word = new WordModel(parts[0]);
+            var word = new Word(parts[0]);
             words.Add(word);
         }
 
         return words;
     }
 
-    public async Task WriteWord(WordModel wordModel)
+    public async Task WriteWord(Word word)
     {
         await using var fs = File.Open(DictionaryFileName, FileMode.Append, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
         await using var sw = new StreamWriter(bs);
-        await sw.WriteLineAsync(wordModel.Value);
+        await sw.WriteLineAsync(word.Value);
     }
 
-    public async Task WriteWords(IEnumerable<WordModel> words)
+    public async Task WriteWords(IEnumerable<Word> words)
     {
         await using var fs = File.Open(DictionaryFileName, FileMode.Append, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
@@ -45,17 +45,17 @@ public class WordFileAccess : IWordRepository
         }
     }
 
-    public async Task AddToCache(WordModel wordModel, string anagrams)
+    public async Task AddToCache(Word word, string anagrams)
     {
         await using var fs = File.Open(WordCacheFileName, FileMode.Append, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
         await using var sw = new StreamWriter(bs);
-        await sw.WriteLineAsync(wordModel.Value + '\t' + anagrams);
+        await sw.WriteLineAsync(word.Value + '\t' + anagrams);
     }
     
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
-        var words = new List<CachedWordModel>();
+        var words = new List<CachedWord>();
         
         await using var fs = File.Open(WordCacheFileName, FileMode.Open, FileAccess.Read);
         await using var bs = new BufferedStream(fs);
@@ -64,17 +64,17 @@ public class WordFileAccess : IWordRepository
         while ((line = await sr.ReadLineAsync()) != null)
         {
             var parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
-            var word = new CachedWordModel(parts[0], parts[1]);
+            var word = new CachedWord(parts[0], parts[1]);
             words.Add(word);
         }
 
         return words;
     }
 
-    public async Task RemoveWordFromCache(WordModel wordModel)
+    public async Task RemoveWordFromCache(Word word)
     {
         var cachedWords = await ReadWordsFromCache();
-        cachedWords = cachedWords.Where(x => x.Word != wordModel.Value);
+        cachedWords = cachedWords.Where(x => x.Word != word.Value);
         await using var fs = File.Open(WordCacheFileName, FileMode.Create, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
         await using var sw = new StreamWriter(bs);
@@ -84,7 +84,7 @@ public class WordFileAccess : IWordRepository
         }
     }
 
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         await using var fs = File.Open(SearchHistoryFileName, FileMode.Append, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
@@ -92,9 +92,9 @@ public class WordFileAccess : IWordRepository
         await sw.WriteLineAsync(model.UserIP + '\t' + model.SearchDate + '\t' + model.SearchString + '\t' + model.FoundAnagrams);
     }
 
-    public async Task<IEnumerable<WordModel>> SearchWordsByFilter(string input)
+    public async Task<IEnumerable<Word>> SearchWordsByFilter(string input)
     {
-        var words = new List<WordModel>();
+        var words = new List<Word>();
         await using var fs = File.Open(DictionaryFileName, FileMode.Open, FileAccess.Read);
         await using var bs = new BufferedStream(fs);
         using var sr = new StreamReader(bs);
@@ -104,7 +104,7 @@ public class WordFileAccess : IWordRepository
             var parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
             if (parts[0].Contains(input))
             {
-                words.Add(new WordModel(parts[0]));
+                words.Add(new Word(parts[0]));
             }
         }
 

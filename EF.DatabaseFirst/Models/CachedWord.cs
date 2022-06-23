@@ -6,13 +6,15 @@ namespace EF.DatabaseFirst.Models
     public partial class CachedWord
     {
         public int Id { get; set; }
-        public string Word { get; set; } = null!;
         public string? Anagrams { get; set; }
+        public int FkWordId { get; set; }
 
-        public CachedWord(string word, string anagrams)
+        public virtual Word FkWord { get; set; } = null!;
+
+        public CachedWord(string anagrams, int fkWordId)
         {
-            Word = word;
             Anagrams = anagrams;
+            FkWordId = fkWordId;
         }
     }
 }

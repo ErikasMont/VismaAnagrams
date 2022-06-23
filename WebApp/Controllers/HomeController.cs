@@ -31,18 +31,18 @@ public class HomeController : Controller
         if (model.SearchString.Length < _wordSettings.MinInputLength)
         {
             await _wordService.AddSearch(userIp, model.SearchString,
-                new List<AnagramModel>());
+                new List<Anagram>());
             model.ErrorMessage = "The given word was too short";
             return View("Index", model);
         }
 
-        var cachedWord = await _wordService.GetWordFromCache(new WordModel(model.SearchString));
+        var cachedWord = await _wordService.GetWordFromCache(new Word(model.SearchString));
 
-        List<AnagramModel>? anagrams;
+        List<Anagram>? anagrams;
         if (cachedWord == null)
         {
             anagrams = await _anagramSolver.GetAnagrams(model.SearchString, _wordSettings.AnagramCount);
-            await _wordService.WriteWordToCache(new WordModel(model.SearchString), anagrams);
+            await _wordService.WriteWordToCache(new Word(model.SearchString), anagrams);
             model.Anagrams = anagrams;
             model.ErrorMessage = "";
             if (!model.Anagrams.Any())
@@ -55,7 +55,7 @@ public class HomeController : Controller
         }
 
         var cachedAnagrams = _wordService.ValidateInputWords(cachedWord.Anagrams).ToList();
-        anagrams = cachedAnagrams.Select(x => new AnagramModel(x)).ToList();
+        anagrams = cachedAnagrams.Select(x => new Anagram(x)).ToList();
         model.Anagrams = anagrams;
         model.ErrorMessage = "";
         if (!model.Anagrams.Any())
@@ -81,7 +81,7 @@ public class HomeController : Controller
         }
         var words = await _wordService.GetWordsList();
 
-        return View("AllWordsList", PaginatedList<WordModel>.Create(words, pageNumber ?? 1, 100));
+        return View("AllWordsList", PaginatedList<Word>.Create(words, pageNumber ?? 1, 100));
     }
 
     public async Task<IActionResult> AddWordToDictionary(WordViewModel? model)

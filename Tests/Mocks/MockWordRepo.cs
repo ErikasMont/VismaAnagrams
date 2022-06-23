@@ -12,11 +12,11 @@ public class MockWordRepo : IWordRepository
         _setNumber = setNumber;
     }
     
-    public async Task<IEnumerable<WordModel>> ReadWords()
+    public async Task<IEnumerable<Word>> ReadWords()
     {
         return _setNumber switch
         {
-            1 => new List<WordModel>
+            1 => new List<Word>
             {
                 new("rega"), new("visma"), new("kava"), new("alus"),
                 new("sula"), new("toli"), new("loti"), new("geras"),
@@ -27,7 +27,7 @@ public class MockWordRepo : IWordRepository
                 new("rasti"), new("labas"), new("rytas"), new("balas"),
                 new("tyras"), new("baslys"), new("tara"), new("ryti")
             },
-            2 => new List<WordModel>()
+            2 => new List<Word>()
         };
 
     }
@@ -35,8 +35,8 @@ public class MockWordRepo : IWordRepository
     /// <summary>
     /// Method required for interface realization
     /// </summary>
-    /// <param name="wordModel"></param>
-    public async Task WriteWord(WordModel wordModel)
+    /// <param name="word"></param>
+    public async Task WriteWord(Word word)
     {
        
     }
@@ -46,7 +46,7 @@ public class MockWordRepo : IWordRepository
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task WriteWords(IEnumerable<WordModel> words)
+    public async Task WriteWords(IEnumerable<Word> words)
     {
         
     }
@@ -54,11 +54,11 @@ public class MockWordRepo : IWordRepository
     /// <summary>
     /// Method required for interface realization
     /// </summary>
-    /// <param name="wordModel"></param>
+    /// <param name="word"></param>
     /// <param name="anagrams"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task AddToCache(WordModel wordModel, string anagrams)
+    public async Task AddToCache(Word word, string anagrams)
     {
         
     }
@@ -67,24 +67,24 @@ public class MockWordRepo : IWordRepository
     /// Method required for interface realization
     /// </summary>
     /// <returns></returns>
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
         return _setNumber switch
         {
-            1 => new List<CachedWordModel>
+            1 => new List<CachedWord>
             {
                 new("rega", "gera"), new("labas", "balas"), new("rytas", "tyras"),
                 new("alus", "sula")
             },
-            2 => new List<CachedWordModel>()
+            2 => new List<CachedWord>()
         };
     }
 
     /// <summary>
     /// Method required for interface realization
     /// </summary>
-    /// <param name="wordModel"></param>
-    public async Task RemoveWordFromCache(WordModel wordModel)
+    /// <param name="word"></param>
+    public async Task RemoveWordFromCache(Word word)
     {
         
     }
@@ -95,7 +95,7 @@ public class MockWordRepo : IWordRepository
     /// <param name="model"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         
     }
@@ -105,9 +105,9 @@ public class MockWordRepo : IWordRepository
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<WordModel>> SearchWordsByFilter(string input)
+    public async Task<IEnumerable<Word>> SearchWordsByFilter(string input)
     {
-        return new List<WordModel>
+        return new List<Word>
         {
             new("rega"), new("visma"), new("kava"), new("alus"),
             new("sula"), new("toli"), new("loti"), new("geras"),

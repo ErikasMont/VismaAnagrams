@@ -5,15 +5,15 @@ namespace Contracts.Interfaces;
 public interface IWordService
 {
     Task WriteWordsToDb();
-    Task<List<WordModel>> GetWordsList();
-    Task WriteWordToCache(WordModel wordModel, IEnumerable<AnagramModel> anagrams);
-    Task<CachedWordModel> GetWordFromCache(WordModel wordModel);
+    Task<List<Word>> GetWordsList();
+    Task WriteWordToCache(Word word, IEnumerable<Anagram> anagrams);
+    Task<CachedWord> GetWordFromCache(Word word);
     Task ClearCache();
-    Task AddSearch(string userIp, string searchString, List<AnagramModel> foundAnagrams);
-    Task<IEnumerable<WordModel>> SearchWords(string input);
-    Task<Dictionary<string, List<AnagramModel>>> GetSortedWords();
+    Task AddSearch(string userIp, string searchString, List<Anagram> foundAnagrams);
+    Task<IEnumerable<Word>> SearchWords(string input);
+    Task<Dictionary<string, List<Anagram>>> GetSortedWords();
     string Alphabetize(string input);
     string[] ValidateInputWords(string input);
-    List<AnagramModel> RemoveDuplicates(List<AnagramModel> anagrams, AnagramModel userInput);
+    List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userInput);
     Task<bool> AddWordToFile(string word);
 }

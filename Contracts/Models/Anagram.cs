@@ -1,23 +1,23 @@
 namespace Contracts.Models;
 
-public class AnagramModel
+public class Anagram
 {
     public string Word { get; set; }
 
-    public AnagramModel(string word)
+    public Anagram(string word)
     {
         Word = word;
     }
 
     public override bool Equals(object obj)
     {
-        if (obj == null || !(obj is AnagramModel))
+        if (obj == null || !(obj is Anagram))
         {
             return false;
         }
-        AnagramModel anagramModel = obj as AnagramModel;
+        Anagram anagram = obj as Anagram;
 
-        return this.Word.Equals(anagramModel.Word);
+        return this.Word.Equals(anagram.Word);
     }
     
     public override int GetHashCode()

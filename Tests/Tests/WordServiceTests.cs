@@ -80,7 +80,7 @@ public class WordServiceTests
     [Test]
     public void RemoveDuplicates_IfEmptyListWasGiven_EmptyListReturned()
     {
-        var output = _wordService.RemoveDuplicates(new List<AnagramModel>(), new AnagramModel("test"));
+        var output = _wordService.RemoveDuplicates(new List<Anagram>(), new Anagram("test"));
         
         output.ShouldBeEmpty();
     }
@@ -88,12 +88,12 @@ public class WordServiceTests
     [Test]
     public void RemoveDuplicates_IfNotEmptyListWasGiven_ReturnsListWithoutDuplicates()
     {
-        var inputList = new List<AnagramModel>()
+        var inputList = new List<Anagram>()
         {
             new ("alus"), new ("alus"), new ("sula"), new ("geras"),
             new ("rytoj"), new ("sula")
         };
-        var inputAnagram = new AnagramModel("geras");
+        var inputAnagram = new Anagram("geras");
         var expectedCount = 3;
         
         var output = _wordService.RemoveDuplicates(inputList, inputAnagram);
@@ -135,7 +135,7 @@ public class WordServiceTests
     [Test]
     public async Task GetWordFromCache_IfNoWordFound_ReturnsNull()
     {
-        var result = await _wordService.GetWordFromCache(new WordModel("toli"));
+        var result = await _wordService.GetWordFromCache(new Word("toli"));
         
         result.ShouldBeNull();
     }
@@ -145,7 +145,7 @@ public class WordServiceTests
     {
         var expectedAnagrams = "balas";
 
-        var result = await _wordService.GetWordFromCache(new WordModel("labas"));
+        var result = await _wordService.GetWordFromCache(new Word("labas"));
 
         result.ShouldNotBeNull();
         result.Anagrams.ShouldBe(expectedAnagrams);
@@ -154,7 +154,7 @@ public class WordServiceTests
     [Test]
     public async Task SearchWords_Always_ReturnsAListOfWordsByGivenFilter()
     {
-        var expectedWord = new WordModel("kava");
+        var expectedWord = new Word("kava");
 
         var result = await _wordService.SearchWords("ava");
         result.ShouldNotBeEmpty();

@@ -1,21 +1,21 @@
 namespace Contracts.Models;
 
-public class WordModel
+public class Word
 {
     public string Value { get; set; }
 
-    public WordModel(string word)
+    public Word(string word)
     {
         Value = word;
     }
 
     public override bool Equals(object obj)
     {
-        if (obj == null || !(obj is WordModel))
+        if (obj == null || !(obj is Word))
         {
             return false;
         }
-        WordModel anagram = obj as WordModel;
+        Word anagram = obj as Word;
 
         return this.Value.Equals(anagram.Value);
     }

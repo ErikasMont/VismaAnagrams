@@ -21,22 +21,22 @@ public class WordService : IWordService
         await _wordDbAccess.WriteWords(words);
     }
 
-    public async Task<List<WordModel>> GetWordsList()
+    public async Task<List<Word>> GetWordsList()
     {
         var words = await _wordDbAccess.ReadWords();
         return words.Distinct().ToList();
     }
 
-    public async Task WriteWordToCache(WordModel wordModel, IEnumerable<AnagramModel> anagrams)
+    public async Task WriteWordToCache(Word word, IEnumerable<Anagram> anagrams)
     {
         var wordAnagrams = anagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
-        await _wordDbAccess.AddToCache(wordModel, wordAnagrams);
+        await _wordDbAccess.AddToCache(word, wordAnagrams);
     }
 
-    public async Task<CachedWordModel> GetWordFromCache(WordModel wordModel)
+    public async Task<CachedWord> GetWordFromCache(Word word)
     {
         var cachedWords = await _wordDbAccess.ReadWordsFromCache();
-        var cachedWord = cachedWords.Where(x => x.Word == wordModel.Value).ToList();
+        var cachedWord = cachedWords.Where(x => x.Word == word.Value).ToList();
         return cachedWord.Count == 0 ? null : cachedWord[0];
     }
 
@@ -45,29 +45,29 @@ public class WordService : IWordService
         var cachedWords = await _wordDbAccess.ReadWordsFromCache();
         foreach (var cachedWord in cachedWords)
         {
-            await _wordDbAccess.RemoveWordFromCache(new WordModel(cachedWord.Word));
+            await _wordDbAccess.RemoveWordFromCache(new Word(cachedWord.Word));
         }
     }
 
-    public async Task AddSearch(string userIp, string searchString, List<AnagramModel> foundAnagrams)
+    public async Task AddSearch(string userIp, string searchString, List<Anagram> foundAnagrams)
     {
         var anagrams = foundAnagrams == null ? ""
             : foundAnagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
-        var searchHistoryModel = new SearchHistoryModel(userIp, DateTime.Now, searchString, anagrams);
+        var searchHistoryModel = new SearchHistory(userIp, DateTime.Now, searchString, anagrams);
         await _wordDbAccess.AddToSearchHistory(searchHistoryModel);
     }
 
-    public async Task<IEnumerable<WordModel>> SearchWords(string input)
+    public async Task<IEnumerable<Word>> SearchWords(string input)
     {
         return await _wordDbAccess.SearchWordsByFilter(input);
     } 
     
-    public async Task<Dictionary<string, List<AnagramModel>>> GetSortedWords()
+    public async Task<Dictionary<string, List<Anagram>>> GetSortedWords()
     {
         var allWords = await _wordFileAccess.ReadWords();
         var words = allWords.ToList();
         
-        var sortedDictionary = new Dictionary<string, List<AnagramModel>>();
+        var sortedDictionary = new Dictionary<string, List<Anagram>>();
         if (words.Count == 0)
         {
             return sortedDictionary;
@@ -75,7 +75,7 @@ public class WordService : IWordService
         
         foreach (var word in words)
         {
-            var anagram = new AnagramModel(word.Value);
+            var anagram = new Anagram(word.Value);
             var sortedKey = Alphabetize(word.Value);
 
             if (sortedDictionary.ContainsKey(sortedKey))
@@ -84,7 +84,7 @@ public class WordService : IWordService
             }
             else
             {
-                var anagrams = new List<AnagramModel> { anagram };
+                var anagrams = new List<Anagram> { anagram };
                 sortedDictionary.Add(sortedKey, anagrams);
             }
         }
@@ -108,7 +108,7 @@ public class WordService : IWordService
         return parts;
     }
     
-    public List<AnagramModel> RemoveDuplicates(List<AnagramModel> anagrams, AnagramModel userInput)
+    public List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userInput)
     {
         if (!anagrams.Any())
         {
@@ -132,7 +132,7 @@ public class WordService : IWordService
         {
             return false;
         }
-        await _wordFileAccess.WriteWord(new WordModel(word));
+        await _wordFileAccess.WriteWord(new Word(word));
         
         return true;
     }

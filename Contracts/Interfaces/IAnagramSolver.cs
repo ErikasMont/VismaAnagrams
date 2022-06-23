@@ -4,5 +4,5 @@ namespace Contracts.Interfaces;
 
 public interface IAnagramSolver
 {
-    Task<List<AnagramModel>> GetAnagrams(string myWords, int numberOfAnagrams);
+    Task<List<Anagram>> GetAnagrams(string myWords, int numberOfAnagrams);
 }
