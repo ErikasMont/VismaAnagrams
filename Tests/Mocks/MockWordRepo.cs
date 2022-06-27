@@ -119,4 +119,13 @@ public class MockWordRepo : IWordRepository
             new("tyras"), new("baslys"), new("tara"), new("ryti")
         };
     }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <returns></returns>
+    public async Task Commit()
+    {
+        
+    }
 }

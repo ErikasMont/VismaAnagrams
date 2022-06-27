@@ -136,4 +136,9 @@ public class WordDbAccess : IWordRepository
 
         return foundWords;
     }
+
+    public Task Commit()
+    {
+        throw new NotImplementedException();
+    }
 }

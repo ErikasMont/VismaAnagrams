@@ -110,4 +110,9 @@ public class WordFileAccess : IWordRepository
 
         return words;
     }
+
+    public Task Commit()
+    {
+        throw new NotImplementedException();
+    }
 }

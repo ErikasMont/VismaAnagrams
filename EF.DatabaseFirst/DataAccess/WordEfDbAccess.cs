@@ -22,7 +22,6 @@ public class WordEfDbAccess : IWordRepository
     public async Task WriteWord(Contracts.Models.Word word)
     {
         await _context.Words.AddAsync(new Models.Word(word.Value));
-        await Commit();
     }
 
     public async Task WriteWords(IEnumerable<Contracts.Models.Word> words)
@@ -31,14 +30,12 @@ public class WordEfDbAccess : IWordRepository
         {
             await _context.Words.AddAsync(new Models.Word(word.Value));
         }
-        await Commit();
     }
 
     public async Task AddToCache(Contracts.Models.Word word, string anagrams)
     {
         var foundWord = await _context.Words.FirstOrDefaultAsync(x => x.Value == word.Value);
         await _context.CachedWords.AddAsync(new Models.CachedWord(anagrams, foundWord.Id));
-        await Commit();
     }
 
     public async Task<IEnumerable<Contracts.Models.CachedWord>> ReadWordsFromCache()
@@ -54,14 +51,12 @@ public class WordEfDbAccess : IWordRepository
             Value = word.Value
         };
         await _context.Database.ExecuteSqlRawAsync("exec spRemoveCachedWord @GivenWord", givenWord);
-        await Commit();
     }
 
     public async Task AddToSearchHistory(Contracts.Models.SearchHistory model)
     {
         await _context.SearchHistories.AddAsync(
             new Models.SearchHistory(model.UserIP, model.SearchDate, model.SearchString, model.FoundAnagrams));
-        await Commit();
     }
 
     public async Task<IEnumerable<Contracts.Models.Word>> SearchWordsByFilter(string input)
@@ -70,7 +65,7 @@ public class WordEfDbAccess : IWordRepository
             .Select(x => new Contracts.Models.Word(x.Value)).ToListAsync();
     }
 
-    private async Task Commit()
+    public async Task Commit()
     {
         await _context.SaveChangesAsync();
     }
