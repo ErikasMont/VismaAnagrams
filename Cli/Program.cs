@@ -6,24 +6,30 @@ using Microsoft.Extensions.Hosting;
 using Cli;
 using BusinessLogic.Helpers;
 using Contracts.Interfaces;
+using EF.DatabaseFirst.DataAccess;
+using EF.DatabaseFirst.Models;
+using Microsoft.EntityFrameworkCore;
 
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .AddEnvironmentVariables()
     .Build();
 
+var connectionString = config.GetConnectionString("AnagramsDb");
+
 using var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
-        services.AddSingleton<IAnagramSolver, AnagramSolver>()
+        services.AddDbContext<AnagramsDbContext>(option => option.UseSqlServer(connectionString))
+            .AddSingleton<IAnagramSolver, AnagramSolver>()
             .AddSingleton<IWordService, WordService>()
             .AddSingleton<WordFileAccess>()
-            .AddSingleton<WordDbAccess>()
+            .AddSingleton<WordEfDbAccess>()
             .AddSingleton<ServiceResolver>(serviceProvider => key =>
             {
                 return key switch
                 {
                     RepositoryType.File => serviceProvider.GetService<WordFileAccess>(),
-                    RepositoryType.Db => serviceProvider.GetService<WordDbAccess>()
+                    RepositoryType.Db => serviceProvider.GetService<WordEfDbAccess>()
                 };
             }))
     .Build();

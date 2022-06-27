@@ -53,9 +53,9 @@ public class WordFileAccess : IWordRepository
         await sw.WriteLineAsync(word.Value + '\t' + anagrams);
     }
     
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
-        var words = new List<CachedWordModel>();
+        var words = new List<CachedWord>();
         
         await using var fs = File.Open(WordCacheFileName, FileMode.Open, FileAccess.Read);
         await using var bs = new BufferedStream(fs);
@@ -64,7 +64,7 @@ public class WordFileAccess : IWordRepository
         while ((line = await sr.ReadLineAsync()) != null)
         {
             var parts = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
-            var word = new CachedWordModel(parts[0], parts[1]);
+            var word = new CachedWord(parts[0], parts[1]);
             words.Add(word);
         }
 
@@ -84,7 +84,7 @@ public class WordFileAccess : IWordRepository
         }
     }
 
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         await using var fs = File.Open(SearchHistoryFileName, FileMode.Append, FileAccess.Write);
         await using var bs = new BufferedStream(fs);
@@ -109,5 +109,10 @@ public class WordFileAccess : IWordRepository
         }
 
         return words;
+    }
+
+    public Task Commit()
+    {
+        throw new NotImplementedException();
     }
 }

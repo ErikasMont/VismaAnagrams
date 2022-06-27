@@ -8,8 +8,9 @@ public interface IWordRepository
      Task WriteWord(Word word);
      Task WriteWords(IEnumerable<Word> words);
      Task AddToCache(Word word, string anagrams);
-     Task<IEnumerable<CachedWordModel>> ReadWordsFromCache();
+     Task<IEnumerable<CachedWord>> ReadWordsFromCache();
      Task RemoveWordFromCache(Word word);
-     Task AddToSearchHistory(SearchHistoryModel model);
+     Task AddToSearchHistory(SearchHistory model);
      Task<IEnumerable<Word>> SearchWordsByFilter(string input);
+     Task Commit();
 }

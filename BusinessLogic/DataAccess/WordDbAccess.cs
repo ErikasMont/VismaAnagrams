@@ -29,7 +29,8 @@ public class WordDbAccess : IWordRepository
         await using var reader = await command.ExecuteReaderAsync();
         while (reader.Read())
         {
-            var word = new Word(reader[0].ToString());
+            var wordFromDb = reader[0].ToString();
+            var word = new Word(wordFromDb);
             words.Add(word);
         }
 
@@ -73,9 +74,9 @@ public class WordDbAccess : IWordRepository
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
-        var words = new List<CachedWordModel>();
+        var words = new List<CachedWord>();
         var sql = $"SELECT word, anagrams FROM {WordCacheTableName}";
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -83,8 +84,10 @@ public class WordDbAccess : IWordRepository
         await using var reader = await command.ExecuteReaderAsync();
         while (reader.Read())
         {
-            var word = new CachedWordModel(reader[0].ToString(), reader[1].ToString());
-            words.Add(word);
+            var word = reader[0].ToString();
+            var anagrams = reader[1].ToString();
+            var cachedWord = new CachedWord(word, anagrams);
+            words.Add(cachedWord);
         }
 
         return words;
@@ -101,7 +104,7 @@ public class WordDbAccess : IWordRepository
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         var sql = $"INSERT INTO {SearchHistoryTableName} VALUES(@userip, @searchdate, @searchstring, @foundanagrams)";
         await using var connection = new SqlConnection(_connectionString);
@@ -126,10 +129,16 @@ public class WordDbAccess : IWordRepository
         await using var reader = await command.ExecuteReaderAsync();
         while (reader.Read())
         {
-            var word = new Word(reader[0].ToString());
+            var wordFromDb = reader[0].ToString();
+            var word = new Word(wordFromDb);
             foundWords.Add(word);
         }
 
         return foundWords;
+    }
+
+    public Task Commit()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -67,16 +67,16 @@ public class MockWordRepo : IWordRepository
     /// Method required for interface realization
     /// </summary>
     /// <returns></returns>
-    public async Task<IEnumerable<CachedWordModel>> ReadWordsFromCache()
+    public async Task<IEnumerable<CachedWord>> ReadWordsFromCache()
     {
         return _setNumber switch
         {
-            1 => new List<CachedWordModel>
+            1 => new List<CachedWord>
             {
                 new("rega", "gera"), new("labas", "balas"), new("rytas", "tyras"),
                 new("alus", "sula")
             },
-            2 => new List<CachedWordModel>()
+            2 => new List<CachedWord>()
         };
     }
 
@@ -95,7 +95,7 @@ public class MockWordRepo : IWordRepository
     /// <param name="model"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task AddToSearchHistory(SearchHistoryModel model)
+    public async Task AddToSearchHistory(SearchHistory model)
     {
         
     }
@@ -118,5 +118,14 @@ public class MockWordRepo : IWordRepository
             new("rasti"), new("labas"), new("rytas"), new("balas"),
             new("tyras"), new("baslys"), new("tara"), new("ryti")
         };
+    }
+
+    /// <summary>
+    /// Method required for interface realization
+    /// </summary>
+    /// <returns></returns>
+    public async Task Commit()
+    {
+        
     }
 }

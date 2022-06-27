@@ -7,7 +7,7 @@ public interface IWordService
     Task WriteWordsToDb();
     Task<List<Word>> GetWordsList();
     Task WriteWordToCache(Word word, IEnumerable<Anagram> anagrams);
-    Task<CachedWordModel> GetWordFromCache(Word word);
+    Task<CachedWord> GetWordFromCache(Word word);
     Task ClearCache();
     Task AddSearch(string userIp, string searchString, List<Anagram> foundAnagrams);
     Task<IEnumerable<Word>> SearchWords(string input);

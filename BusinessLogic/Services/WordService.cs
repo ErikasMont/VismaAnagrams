@@ -19,6 +19,7 @@ public class WordService : IWordService
     {
         var words = await _wordFileAccess.ReadWords();
         await _wordDbAccess.WriteWords(words);
+        await _wordDbAccess.Commit();
     }
 
     public async Task<List<Word>> GetWordsList()
@@ -31,9 +32,10 @@ public class WordService : IWordService
     {
         var wordAnagrams = anagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
         await _wordDbAccess.AddToCache(word, wordAnagrams);
+        await _wordDbAccess.Commit();
     }
 
-    public async Task<CachedWordModel> GetWordFromCache(Word word)
+    public async Task<CachedWord> GetWordFromCache(Word word)
     {
         var cachedWords = await _wordDbAccess.ReadWordsFromCache();
         var cachedWord = cachedWords.Where(x => x.Word == word.Value).ToList();
@@ -47,14 +49,17 @@ public class WordService : IWordService
         {
             await _wordDbAccess.RemoveWordFromCache(new Word(cachedWord.Word));
         }
+
+        await _wordDbAccess.Commit();
     }
 
     public async Task AddSearch(string userIp, string searchString, List<Anagram> foundAnagrams)
     {
         var anagrams = foundAnagrams == null ? ""
             : foundAnagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
-        var searchHistoryModel = new SearchHistoryModel(userIp, DateTime.Now, searchString, anagrams);
+        var searchHistoryModel = new SearchHistory(userIp, DateTime.Now, searchString, anagrams);
         await _wordDbAccess.AddToSearchHistory(searchHistoryModel);
+        await _wordDbAccess.Commit();
     }
 
     public async Task<IEnumerable<Word>> SearchWords(string input)
@@ -133,7 +138,7 @@ public class WordService : IWordService
             return false;
         }
         await _wordFileAccess.WriteWord(new Word(word));
-        
+
         return true;
     }
 
