@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF.DatabaseFirst", "EF.DatabaseFirst\EF.DatabaseFirst.csproj", "{CDD64F37-5553-4B2E-909B-FDA20D655677}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF.CodeFirst", "EF.CodeFirst\EF.CodeFirst.csproj", "{0E2ADC3E-7F3F-48CC-BEEA-2AC84F87B096}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{CDD64F37-5553-4B2E-909B-FDA20D655677}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDD64F37-5553-4B2E-909B-FDA20D655677}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDD64F37-5553-4B2E-909B-FDA20D655677}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E2ADC3E-7F3F-48CC-BEEA-2AC84F87B096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E2ADC3E-7F3F-48CC-BEEA-2AC84F87B096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E2ADC3E-7F3F-48CC-BEEA-2AC84F87B096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E2ADC3E-7F3F-48CC-BEEA-2AC84F87B096}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

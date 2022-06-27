@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\EF.CodeFirst\EF.CodeFirst.csproj" />
       <ProjectReference Include="..\EF.DatabaseFirst\EF.DatabaseFirst.csproj" />
     </ItemGroup>
 
@@ -17,7 +18,7 @@
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-      <Exec Command="copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(ProjectDir)&quot;&#xA;" />
+      <Exec Command="copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(TargetDir)&quot;&#xA;copy &quot;$(SolutionDir)\zodynas.txt&quot; &quot;$(ProjectDir)&quot;" />
     </Target>
 
 </Project>

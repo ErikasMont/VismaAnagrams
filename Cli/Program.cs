@@ -6,8 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Cli;
 using BusinessLogic.Helpers;
 using Contracts.Interfaces;
-using EF.DatabaseFirst.DataAccess;
-using EF.DatabaseFirst.Models;
+using EF.CodeFirst.DataAccess;
+using EF.CodeFirst.Data;
 using Microsoft.EntityFrameworkCore;
 
 IConfiguration config = new ConfigurationBuilder()
@@ -15,11 +15,11 @@ IConfiguration config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-var connectionString = config.GetConnectionString("AnagramsDb");
+var connectionString = config.GetConnectionString("AnagramsCodeFirstDb");
 
 using var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
-        services.AddDbContext<AnagramsDbContext>(option => option.UseSqlServer(connectionString))
+        services.AddDbContext<AnagramsCodeFirstDbContext>(option => option.UseSqlServer(connectionString))
             .AddSingleton<IAnagramSolver, AnagramSolver>()
             .AddSingleton<IWordService, WordService>()
             .AddSingleton<WordFileAccess>()
@@ -34,6 +34,8 @@ using var host = Host.CreateDefaultBuilder(args)
             }))
     .Build();
 
+var dbContext = host.Services.GetRequiredService<AnagramsCodeFirstDbContext>();
+dbContext.Database.EnsureCreated();
 var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
 var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
