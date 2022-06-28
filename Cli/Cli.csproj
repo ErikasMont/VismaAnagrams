@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+      <ProjectReference Include="..\EF.CodeFirst\EF.CodeFirst.csproj" />
       <ProjectReference Include="..\EF.DatabaseFirst\EF.DatabaseFirst.csproj" />
     </ItemGroup>
 

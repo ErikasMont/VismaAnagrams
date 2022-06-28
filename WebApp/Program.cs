@@ -2,8 +2,8 @@ using BusinessLogic.DataAccess;
 using BusinessLogic.Helpers;
 using BusinessLogic.Services;
 using Contracts.Interfaces;
-using EF.DatabaseFirst.DataAccess;
-using EF.DatabaseFirst.Models;
+using EF.CodeFirst.Data;
+using EF.CodeFirst.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Helpers;
 
@@ -11,8 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-var connectionString = builder.Configuration.GetConnectionString("AnagramsDb");
-builder.Services.AddDbContext<AnagramsDbContext>(option => option.UseSqlServer(connectionString))
+var connectionString = builder.Configuration.GetConnectionString("AnagramsCodeFirstDb");
+builder.Services.AddDbContext<AnagramsCodeFirstDbContext>(option => 
+        option.UseSqlServer(connectionString))
     .AddScoped<IAnagramSolver, AnagramSolver>()
     .AddScoped<IWordService, WordService>()
     .AddScoped<WordEfDbAccess>()
@@ -29,6 +30,14 @@ builder.Services.AddDbContext<AnagramsDbContext>(option => option.UseSqlServer(c
 builder.Services.Configure<WordSettings>(builder.Configuration.GetSection("WordSettings"));
 
 var app = builder.Build();
+
+using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>()
+           .CreateScope())
+{
+    var dbContext = serviceScope.ServiceProvider.GetService<AnagramsCodeFirstDbContext>();
+
+    dbContext.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
