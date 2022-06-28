@@ -67,6 +67,19 @@ public class WordEfDbAccess : IWordRepository
             .Select(x => new Contracts.Models.Word(x.Value)).ToListAsync();
     }
 
+    public async Task RemoveWord(string word)
+    {
+        var foundWord = await _context.Words.FirstOrDefaultAsync(x => x.Value == word);
+        _context.Words.Remove(foundWord);
+    }
+
+    public async Task EditWord(string existingWord, string editedWord)
+    {
+        var word = await _context.Words.FirstOrDefaultAsync(x => x.Value == existingWord);
+        word.Value = editedWord;
+        _context.Words.Update(word);
+    }
+
     public async Task Commit()
     {
         await _context.SaveChangesAsync();

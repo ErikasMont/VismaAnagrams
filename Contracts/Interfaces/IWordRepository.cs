@@ -12,5 +12,7 @@ public interface IWordRepository
      Task RemoveWordFromCache(Word word);
      Task AddToSearchHistory(SearchHistory model);
      Task<IEnumerable<Word>> SearchWordsByFilter(string input);
+     Task RemoveWord(string word);
+     Task EditWord(string existingWord, string editedWord);
      Task Commit();
 }
