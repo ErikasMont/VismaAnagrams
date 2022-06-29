@@ -30,18 +30,11 @@ public class UserEfDbAccess : IUserRepository
         return new Contracts.Models.User(user.UserIp, user.SearchesLeft);
     }
 
-    public async Task IncreaseSearchCount(string userIp)
+    public async Task ChangeSearchCount(Contracts.Models.User user)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIp == userIp);
-        user.SearchesLeft++;
-        _context.Users.Update(user);
-    }
-
-    public async Task ReduceSearchCount(string userIp)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserIp == userIp);
-        user.SearchesLeft--;
-        _context.Users.Update(user);
+        var foundUser = await _context.Users.FirstOrDefaultAsync(x => x.UserIp == user.UserIp);
+        foundUser.SearchesLeft = user.SearchesLeft;
+        _context.Users.Update(foundUser);
     }
 
     public async Task Commit()

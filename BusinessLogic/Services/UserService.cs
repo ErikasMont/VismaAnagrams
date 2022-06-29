@@ -32,16 +32,18 @@ public class UserService : IUserService
 
     public async Task UpdateSearchCount(string option, string userIp)
     {
+        var user = await _userRepository.ReadUser(userIp);
         switch (option)
         {
             case "reduce":
-                await _userRepository.ReduceSearchCount(userIp);
-                await _userRepository.Commit();
+                user.SearchesLeft--;
                 break;
             case "increase":
-                await _userRepository.IncreaseSearchCount(userIp);
-                await _userRepository.Commit();
+                user.SearchesLeft++;
                 break;
         }
+        
+        await _userRepository.ChangeSearchCount(user);
+        await _userRepository.Commit();
     }
 }

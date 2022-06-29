@@ -50,20 +50,10 @@ public class MockUserRepo : IUserRepository
     /// Method required for interface realization
     /// </summary>
     /// <param name="userIp"></param>
+    /// <param name="searchCount"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task IncreaseSearchCount(string userIp)
-    {
-        
-    }
-
-    /// <summary>
-    /// Method required for interface realization
-    /// </summary>
-    /// <param name="userIp"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task ReduceSearchCount(string userIp)
+    public async Task ChangeSearchCount(User user)
     {
         
     }
