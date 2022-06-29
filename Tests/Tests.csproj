@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+      <ProjectReference Include="..\GenericEnums\GenericEnums.csproj" />
       <ProjectReference Include="..\WebApp\WebApp.csproj" />
     </ItemGroup>
 

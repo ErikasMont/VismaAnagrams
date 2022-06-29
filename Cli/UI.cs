@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using BusinessLogic.Services;
 using Cli.Helpers;
 using Contracts.Interfaces;
@@ -12,18 +13,23 @@ public class UI
     private readonly AnagramApiClient _anagramsAnagramApi;
     private int _anagramsCount;
     private int _minLength;
-    public UI(IWordService wordService, int anagramsCount, int minLength, string anagramApiUrl)
+    private delegate void Print(string message);
+
+    private readonly Print _printDelegate;
+    public UI(Action<string> writeToConsole, IWordService wordService,
+        int anagramsCount, int minLength, string anagramApiUrl)
     {
         _wordService = wordService;
         _anagramsCount = anagramsCount;
         _minLength = minLength;
         _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
+        _printDelegate = new Print(writeToConsole);
     }
 
     public async Task RunAsync()
     {
         var flag = true;
-        Console.WriteLine("Hello! Welcome to anagram solver app");
+        _printDelegate("Hello! Welcome to anagram solver app");
         var transfer = TrasferChoice();
         if (transfer)
         {
@@ -64,7 +70,8 @@ public class UI
             return;
         }
         
-        PrintAnagrams(anagrams);
+        var anagramsString = StringifyAnagrams(anagrams);
+        FormattedPrint(CapitalizeFirstLetter, anagramsString);
     }
 
     private bool ExitChoice()
@@ -91,13 +98,19 @@ public class UI
         };
     }
 
-    private void PrintAnagrams(List<Anagram> anagrams)
+    private string StringifyAnagrams(List<Anagram> anagrams)
     {
-        Console.Write("Anagrams: ");
-        foreach (var anagram in anagrams)
-        {
-            Console.Write("{0} ", anagram.Word);
-        }
-        Console.WriteLine();
+        return anagrams.Aggregate("", (current, anagram) => current + (anagram.Word + " "));
+    }
+
+    private void FormattedPrint(Func<string, string> capitalizeFirstLetter, string input)
+    {
+        input = capitalizeFirstLetter(input);
+        _printDelegate(input);
+    }
+    
+    private string CapitalizeFirstLetter(string input)
+    {
+        return Regex.Replace(input, "^[a-z]", m => m.Value.ToUpper());
     }
 }

@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DataAccess;
+﻿using System.Diagnostics;
+using BusinessLogic.DataAccess;
 using BusinessLogic.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,5 +41,24 @@ var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
 var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
 
-var ui = new UI(host.Services.GetRequiredService<IWordService>(), anagramCount, minInputLength, anagramApiClientUrl);
+var ui = new UI(WriteToConsole, host.Services.GetRequiredService<IWordService>(), anagramCount, 
+    minInputLength, anagramApiClientUrl);
 await ui.RunAsync();
+
+void WriteToConsole(string message)
+{
+    Console.WriteLine(message);
+}
+
+void WriteToDebug(string message)
+{
+    Debug.WriteLine(message);
+}
+
+void WriteToTxt(string message)
+{
+    using var fs = File.Open("delegates.txt", FileMode.Append, FileAccess.Write);
+    using var bs = new BufferedStream(fs);
+    using var sw = new StreamWriter(bs);
+    sw.WriteLine(message);
+}
