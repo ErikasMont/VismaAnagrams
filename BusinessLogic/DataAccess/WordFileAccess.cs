@@ -111,6 +111,16 @@ public class WordFileAccess : IWordRepository
         return words;
     }
 
+    public Task RemoveWord(string word)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task EditWord(string existingWord, string editedWord)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task Commit()
     {
         throw new NotImplementedException();

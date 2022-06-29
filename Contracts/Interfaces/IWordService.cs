@@ -15,5 +15,7 @@ public interface IWordService
     string Alphabetize(string input);
     string[] ValidateInputWords(string input);
     List<Anagram> RemoveDuplicates(List<Anagram> anagrams, Anagram userInput);
-    Task<bool> AddWordToFile(string word);
+    Task<bool> AddWord(string word);
+    Task RemoveWord(string word);
+    Task<bool> EditWord(string existingWord, string editedWord);
 }

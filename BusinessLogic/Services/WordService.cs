@@ -130,7 +130,7 @@ public class WordService : IWordService
         return filteredAnagrams;
     }
 
-    public async Task<bool> AddWordToFile(string word)
+    public async Task<bool> AddWord(string word)
     {
         var exists = await WordExists(word);
         if (exists)
@@ -139,6 +139,21 @@ public class WordService : IWordService
         }
         await _wordFileAccess.WriteWord(new Word(word));
 
+        return true;
+    }
+
+    public async Task RemoveWord(string word)
+    {
+        await _wordDbAccess.RemoveWord(word);
+    }
+
+    public async Task<bool> EditWord(string existingWord, string editedWord)
+    {
+        if (await WordExists(editedWord))
+        {
+            return false;
+        }
+        await _wordDbAccess.EditWord(existingWord, editedWord);
         return true;
     }
 

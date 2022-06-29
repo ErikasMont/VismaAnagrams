@@ -16,6 +16,8 @@ builder.Services.AddDbContext<AnagramsCodeFirstDbContext>(option =>
         option.UseSqlServer(connectionString))
     .AddScoped<IAnagramSolver, AnagramSolver>()
     .AddScoped<IWordService, WordService>()
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<IUserRepository, UserEfDbAccess>()
     .AddScoped<WordEfDbAccess>()
     .AddScoped<WordFileAccess>()
     .AddScoped<ServiceResolver>(serviceProvider => key =>

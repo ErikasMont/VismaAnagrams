@@ -107,7 +107,7 @@ public class WordServiceTests
     {
         var word = "alus";
 
-        var result = await _wordService.AddWordToFile(word);
+        var result = await _wordService.AddWord(word);
         
         result.ShouldBeFalse();
     }
@@ -117,7 +117,7 @@ public class WordServiceTests
     {
         var word = "testas";
 
-        var result = await _wordService.AddWordToFile(word);
+        var result = await _wordService.AddWord(word);
         
         result.ShouldBeTrue();
     }
@@ -157,7 +157,30 @@ public class WordServiceTests
         var expectedWord = new Word("kava");
 
         var result = await _wordService.SearchWords("ava");
+        
         result.ShouldNotBeEmpty();
         result.ShouldContain(expectedWord);
+    }
+
+    [Test]
+    public async Task EditWord_IfWordAlreadyExists_ReturnsFalse()
+    {
+        var existingWord = "alus";
+        var editedWord = "alus";
+
+        var result = await _wordService.EditWord(existingWord, editedWord);
+        
+        result.ShouldBeFalse();
+    }
+    
+    [Test]
+    public async Task EditWord_IfWordDoesNotAlreadyExist_ReturnsFalse()
+    {
+        var existingWord = "alus";
+        var editedWord = "aluss";
+
+        var result = await _wordService.EditWord(existingWord, editedWord);
+        
+        result.ShouldBeTrue();
     }
 }

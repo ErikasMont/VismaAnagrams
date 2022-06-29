@@ -1,0 +1,14 @@
+@model WebApp.Models.EditWordViewModel
+@{
+    ViewData["Title"] = "Edit word form";
+}
+
+<form asp-action="EditWord">
+    <div class="form-actions no-color">
+        <input asp-for="ExistingWord" type="hidden" value="@Model.ExistingWord"/>
+        <p>Currently editing word: @Model.ExistingWord</p>
+        <label asp-for="EditedWord" class="control-label">Enter new value:</label>
+        <input asp-for="EditedWord" class="form-control"/>
+        <input type="submit" value="Save" class="btn btn-default"/>
+    </div>
+</form>
