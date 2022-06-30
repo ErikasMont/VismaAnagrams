@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 using BusinessLogic.DataAccess;
 using BusinessLogic.Services;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using Contracts.Interfaces;
 using EF.CodeFirst.DataAccess;
 using EF.CodeFirst.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -41,24 +43,34 @@ var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
 var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
 var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
 
-var ui = new UI(WriteToConsole, host.Services.GetRequiredService<IWordService>(), anagramCount, 
+/*var ui = new UI(WriteToConsole, CapitalizeFirstLetter, host.Services.GetRequiredService<IWordService>(), anagramCount, 
     minInputLength, anagramApiClientUrl);
-await ui.RunAsync();
+await ui.RunAsync();*/
 
-void WriteToConsole(string message)
+var uiWithEvents = new UIWithEvents(CapitalizeFirstLetter, host.Services.GetRequiredService<IWordService>(),
+    anagramCount, minInputLength, anagramApiClientUrl);
+uiWithEvents.PrintEvent += WriteToConsole;
+uiWithEvents.PrintEvent += WriteToTxt;
+await uiWithEvents.RunAsync();
+
+void WriteToConsole(object? sender, string message)
 {
     Console.WriteLine(message);
 }
 
-void WriteToDebug(string message)
+void WriteToDebug(object? sender, string message)
 {
     Debug.WriteLine(message);
 }
 
-void WriteToTxt(string message)
+void WriteToTxt(object? sender, string message)
 {
     using var fs = File.Open("delegates.txt", FileMode.Append, FileAccess.Write);
-    using var bs = new BufferedStream(fs);
-    using var sw = new StreamWriter(bs);
+    using var sw = new StreamWriter(fs);
     sw.WriteLine(message);
+}
+
+string CapitalizeFirstLetter(string input)
+{
+    return Regex.Replace(input, "^[a-z]", m => m.Value.ToUpper());
 }

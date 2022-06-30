@@ -5,30 +5,29 @@ using Contracts.Models;
 
 namespace Cli;
 
-public class UI
+public class UIWithEvents
 {
     private readonly IWordService _wordService;
     private readonly AnagramApiClient _anagramsAnagramApi;
     private int _anagramsCount;
     private int _minLength;
-
-    private readonly Action<string> _printDelegate;
     private readonly Func<string, string> _capitalizeFirstLetterDelegate;
-    public UI(Action<string> print, Func<string, string> capitalizeFirstLetter, IWordService wordService,
+    
+    public EventHandler<string> PrintEvent; 
+    public UIWithEvents(Func<string, string> capitalizeFirstLetter, IWordService wordService,
         int anagramsCount, int minLength, string anagramApiUrl)
     {
         _wordService = wordService;
         _anagramsCount = anagramsCount;
         _minLength = minLength;
         _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
-        _printDelegate = print;
         _capitalizeFirstLetterDelegate = capitalizeFirstLetter;
     }
 
     public async Task RunAsync()
     {
         var flag = true;
-        _printDelegate("Hello! Welcome to anagram solver app");
+        PrintEvent(this, "Hello! Welcome to anagram solver app");
         var transfer = TrasferChoice();
         if (transfer)
         {
@@ -105,6 +104,6 @@ public class UI
     private void FormattedPrint(Func<string, string> capitalizeFirstLetter, string input)
     {
         input = capitalizeFirstLetter(input);
-        _printDelegate(input);
+        PrintEvent(this, input);
     }
 }
