@@ -11,7 +11,6 @@ using Contracts.Interfaces;
 using EF.CodeFirst.DataAccess;
 using EF.CodeFirst.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -19,12 +18,21 @@ IConfiguration config = new ConfigurationBuilder()
     .Build();
 
 var connectionString = config.GetConnectionString("AnagramsCodeFirstDb");
+var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
 
 using var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
         services.AddDbContext<AnagramsCodeFirstDbContext>(option => option.UseSqlServer(connectionString))
             .AddSingleton<IAnagramSolver, AnagramSolver>()
             .AddSingleton<IWordService, WordService>()
+            .AddSingleton<IDisplay, UIWithEvents>(provider =>
+            {
+                var ui = new UIWithEvents(CapitalizeFirstLetter, provider.GetRequiredService<IWordService>(),
+                    anagramApiClientUrl);
+                ui.PrintEvent += WriteToConsole;
+                ui.PrintEvent += WriteToTxt;
+                return ui;
+            })
             .AddSingleton<WordFileAccess>()
             .AddSingleton<WordEfDbAccess>()
             .AddSingleton<ServiceResolver>(serviceProvider => key =>
@@ -39,19 +47,9 @@ using var host = Host.CreateDefaultBuilder(args)
 
 var dbContext = host.Services.GetRequiredService<AnagramsCodeFirstDbContext>();
 dbContext.Database.EnsureCreated();
-var anagramCount = config.GetRequiredSection("AnagramCount").Get<int>();
-var minInputLength = config.GetRequiredSection("MinInputLength").Get<int>();
-var anagramApiClientUrl = config.GetRequiredSection("LocalAnagramApiClientURL").Get<string>();
 
-/*var ui = new UI(WriteToConsole, CapitalizeFirstLetter, host.Services.GetRequiredService<IWordService>(), anagramCount, 
-    minInputLength, anagramApiClientUrl);
-await ui.RunAsync();*/
-
-var uiWithEvents = new UIWithEvents(CapitalizeFirstLetter, host.Services.GetRequiredService<IWordService>(),
-    anagramCount, minInputLength, anagramApiClientUrl);
-uiWithEvents.PrintEvent += WriteToConsole;
-uiWithEvents.PrintEvent += WriteToTxt;
-await uiWithEvents.RunAsync();
+var ui = host.Services.GetRequiredService<IDisplay>();
+await ui.RunAsync();
 
 void WriteToConsole(object? sender, string message)
 {

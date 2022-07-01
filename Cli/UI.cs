@@ -5,21 +5,16 @@ using Contracts.Models;
 
 namespace Cli;
 
-public class UI
+public class UI : IDisplay
 {
     private readonly IWordService _wordService;
     private readonly AnagramApiClient _anagramsAnagramApi;
-    private int _anagramsCount;
-    private int _minLength;
 
     private readonly Action<string> _printDelegate;
     private readonly Func<string, string> _capitalizeFirstLetterDelegate;
-    public UI(Action<string> print, Func<string, string> capitalizeFirstLetter, IWordService wordService,
-        int anagramsCount, int minLength, string anagramApiUrl)
+    public UI(Action<string> print, Func<string, string> capitalizeFirstLetter, IWordService wordService, string anagramApiUrl)
     {
         _wordService = wordService;
-        _anagramsCount = anagramsCount;
-        _minLength = minLength;
         _anagramsAnagramApi = new AnagramApiClient(anagramApiUrl);
         _printDelegate = print;
         _capitalizeFirstLetterDelegate = capitalizeFirstLetter;
@@ -27,19 +22,19 @@ public class UI
 
     public async Task RunAsync()
     {
-        var flag = true;
+        var shouldExit = true;
         _printDelegate("Hello! Welcome to anagram solver app");
-        var transfer = TrasferChoice();
-        if (transfer)
+        var shouldTransfer = ShouldTransferDataToDb();
+        if (shouldTransfer)
         {
             await _wordService.WriteWordsToDb();
         }
         
-        while (flag)
+        while (shouldExit)
         {
             await UserInputAsync();
-            flag = ExitChoice();
-            if (!flag)
+            shouldExit = ShouldExitApp();
+            if (!shouldExit)
             {
                 Console.WriteLine("Exiting.");
             }
@@ -73,7 +68,7 @@ public class UI
         FormattedPrint(_capitalizeFirstLetterDelegate, anagramsString);
     }
 
-    private bool ExitChoice()
+    private bool ShouldExitApp()
     {
         Console.WriteLine("Would you like to exit? (y/n): ");
         var choice = Console.ReadLine();
@@ -85,7 +80,7 @@ public class UI
         };
     }
 
-    private bool TrasferChoice()
+    private bool ShouldTransferDataToDb()
     {
         Console.WriteLine("Transfer files to database? (y/n)");
         var choice = Console.ReadLine();

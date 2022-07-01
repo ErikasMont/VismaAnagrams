@@ -19,10 +19,10 @@ public class GenericEnums
         Sunday
     }
 
-    public static TEnum MapValueToEnum<TEnum>(string value) 
+    public static TEnum MapValueToEnum<TEnum, TValue>(TValue value) 
         where TEnum : struct
     {
-        if (!Enum.TryParse<TEnum>(value, out var result))
+        if (!Enum.TryParse<TEnum>(value.ToString(), out var result))
         {
             throw new Exception($"Value '{value}' is not part of enum");
         }
